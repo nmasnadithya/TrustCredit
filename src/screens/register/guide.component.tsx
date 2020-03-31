@@ -2,19 +2,19 @@ import React, {Component} from 'react';
 import {ImageStyle, SafeAreaView} from 'react-native';
 import {Divider, Icon, Layout, Text, TopNavigation, TopNavigationAction} from '@ui-kitten/components';
 import {StackNavigationProp} from "@react-navigation/stack";
-import {AppRoute, RootStackParamList} from "../navigation.component";
+import {AppRoute, AuthStackParamList} from "../../navigation.component";
 
 const BackIcon = (style: ImageStyle) => (
     <Icon {...style} name='arrow-back'/>
 );
 
-type NavigationProp = StackNavigationProp<RootStackParamList, AppRoute.DETAILS>;
+type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.GUIDE>;
 
 type Props = {
     navigation: NavigationProp;
 };
 
-export default class DetailsScreen extends Component<Props> {
+export default class GuideScreen extends Component<Props> {
 
     navigateBack() {
         this.props.navigation.goBack();
@@ -24,7 +24,7 @@ export default class DetailsScreen extends Component<Props> {
         return (
             <SafeAreaView style={{flex: 1}}>
                 <TopNavigation
-                    title='MyApp'
+                    title='Guide'
                     alignment='center'
                     leftControl={<TopNavigationAction
                         icon={BackIcon}
@@ -33,7 +33,7 @@ export default class DetailsScreen extends Component<Props> {
                 />
                 <Divider/>
                 <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                    <Text category='h1'>DETAILS</Text>
+                    <Text category='h1'>This is the guide</Text>
                 </Layout>
             </SafeAreaView>
         );

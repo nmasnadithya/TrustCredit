@@ -1,16 +1,17 @@
 import React, {Component} from 'react';
-import {Image, SafeAreaView} from 'react-native';
+import {Image, ImageStyle, SafeAreaView} from 'react-native';
 import {Button, Layout, StyleService, Text} from '@ui-kitten/components';
 import {StackNavigationProp} from "@react-navigation/stack";
-import {AppRoute, RootStackParamList} from "../../navigation.component";
+import {AppRoute, AuthStackParamList} from "../../navigation.component";
+import {light} from "@eva-design/eva";
 
-type NavigationProp = StackNavigationProp<RootStackParamList, AppRoute.HOME>;
+type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.WELCOME>;
 
 type Props = {
     navigation: NavigationProp;
 };
 
-const styles = StyleService.create({
+const styles = StyleService.createThemed({
     logo: {
         width: 64,
         height: 64
@@ -22,7 +23,7 @@ const styles = StyleService.create({
         padding: 16,
         flex: 1,
         justifyContent: 'flex-end',
-        alignItems: 'flex-start'
+        alignItems: 'stretch'
     },
     buttonContainer: {
         flex: 0.2,
@@ -35,9 +36,13 @@ const styles = StyleService.create({
         height: 64,
         margin: 4,
         flexGrow: 1
-    }
+    },
+    guideButton: {
+        marginTop: 12,
+        marginHorizontal: 16,
+    },
 
-});
+}, light);
 
 export default class WelcomeScreen extends Component<Props> {
 
@@ -49,12 +54,16 @@ export default class WelcomeScreen extends Component<Props> {
         this.props.navigation.navigate(AppRoute.LOGIN);
     }
 
+    openGuide() {
+        this.props.navigation.navigate(AppRoute.GUIDE);
+    }
+
     render() {
         return (
             <SafeAreaView style={styles.container}>
                 <Layout style={styles.layoutContainer}>
                     <Image
-                        style={styles.logo}
+                        style={styles.logo as ImageStyle}
                         source={{uri: 'https://reactnative.dev/img/tiny_logo.png'}}
                     />
                     <Text category='h1'>Trust Credit.</Text>
@@ -65,6 +74,13 @@ export default class WelcomeScreen extends Component<Props> {
                         <Button style={styles.button} onPress={this.openLogin.bind(this)} size='giant'
                                 appearance='outline'>Sign In</Button>
                     </Layout>
+                    <Button
+                        style={styles.guideButton}
+                        appearance='ghost'
+                        status='basic'
+                        onPress={this.openGuide.bind(this)}>
+                        How the app works?
+                    </Button>
                 </Layout>
             </SafeAreaView>
         );

@@ -11,31 +11,27 @@
  */
 
 import React from 'react';
-import {ImageProps, ImageStyle, StyleSheet,} from 'react-native';
-import {ApplicationProvider, Button, Icon, IconRegistry, Layout, Text,} from '@ui-kitten/components';
+import {ApplicationProvider, IconRegistry,} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import {light as theme, mapping,} from '@eva-design/eva';
 import 'react-native-gesture-handler';
-import {NavigationContainer} from "@react-navigation/native";
 import {Navigator} from "./navigation.component";
+import {MaterialIconsPack} from "./icons/material.icons";
+import {Material2IconsPack} from "./icons/material2.icons";
 
 /**
  * Use any valid `name` property from eva icons (e.g `github`, or `heart-outline`)
  * https://akveo.github.io/eva-icons
  */
-const HeartIcon = (style: ImageStyle): React.ReactElement<ImageProps> => (
-    <Icon {...style} name='heart'/>
-);
 
 const App = (): React.ReactFragment => (
     <React.Fragment>
-        <IconRegistry icons={EvaIconsPack}/>
+        <IconRegistry icons={[EvaIconsPack, MaterialIconsPack, Material2IconsPack]}/>
         <ApplicationProvider mapping={mapping} theme={theme}>
             <Navigator/>
         </ApplicationProvider>
     </React.Fragment>
 );
-
 
 
 export default App;

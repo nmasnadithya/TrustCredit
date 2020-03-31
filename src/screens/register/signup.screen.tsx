@@ -1,5 +1,5 @@
 import {StackNavigationProp} from "@react-navigation/stack";
-import {AppRoute, RootStackParamList} from "../../navigation.component";
+import {AppRoute, AuthStackParamList} from "../../navigation.component";
 import React, {Component} from "react";
 import {Button, CheckBox, Datepicker, Input, Layout, StyleService, Text} from "@ui-kitten/components";
 import {ImageStyle, View} from "react-native";
@@ -10,7 +10,7 @@ import {
     EyeIcon,
     EyeOffIcon,
     FacebookIcon,
-    GoogleIcon,
+    GoogleIcon, NICIcon,
     PersonIcon,
     PlusIcon,
     TwitterIcon
@@ -19,7 +19,7 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
 
-type NavigationProp = StackNavigationProp<RootStackParamList, AppRoute.SIGNUP>;
+type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP>;
 
 type Props = {
     navigation: NavigationProp;
@@ -50,7 +50,6 @@ const styles = StyleService.createThemed({
         borderRadius: 58,
         alignSelf: 'center',
         backgroundColor: 'background-basic-color-1',
-        tintColor: 'color-primary-default',
     },
     editAvatarButton: {
         width: 40,
@@ -70,6 +69,7 @@ const styles = StyleService.createThemed({
     },
     termsCheckBox: {
         marginTop: 24,
+        flexDirection: 'column'
     },
     termsCheckBoxText: {
         color: 'text-hint-color',
@@ -116,7 +116,7 @@ export default class SignupScreen extends Component<Props, State> {
     }
 
     onSignUpButtonPress() {
-        //TODO: implement
+        this.props.navigation.navigate(AppRoute.SIGNUP2);
     }
 
     render() {
@@ -127,7 +127,6 @@ export default class SignupScreen extends Component<Props, State> {
                 <View style={styles.headerContainer}>
                     <ProfileAvatar
                         style={styles.profileAvatar as ImageStyle}
-                        resizeMode='center'
                         source={require('../../assets/image-person.png')}
                         editButton={() => <Button
                             style={styles.editAvatarButton}
@@ -158,6 +157,16 @@ export default class SignupScreen extends Component<Props, State> {
                             this.setState({email: text})
                         }}
                     />
+                    <Input
+                        autoCapitalize='none'
+                        placeholder='NIC'
+                        style={styles.emailInput}
+                        icon={NICIcon}
+                        value={this.state.address}
+                        onChangeText={text => {
+                            this.setState({address: text})
+                        }}
+                    />
                     <Datepicker
                         placeholder='Birthday'
                         style={styles.emailInput}
@@ -166,16 +175,6 @@ export default class SignupScreen extends Component<Props, State> {
                             this.setState({dob: date})
                         }}
                         icon={CalendarIcon}
-                    />
-                    <Input
-                        autoCapitalize='none'
-                        placeholder='Address'
-                        style={styles.emailInput}
-                        icon={AddressIcon}
-                        value={this.state.address}
-                        onChangeText={text => {
-                            this.setState({address: text})
-                        }}
                     />
                     <Input
                         style={styles.passwordInput}
@@ -189,13 +188,15 @@ export default class SignupScreen extends Component<Props, State> {
                         }}
                         onIconPress={this.onPasswordIconPress.bind(this)}
                     />
-                    <CheckBox
-                        style={styles.termsCheckBox}
-                        textStyle={styles.termsCheckBoxText}
-                        text='I read and agree to Terms & Conditions'
-                        checked={this.state.termsAccepted}
-                        onChange={(checked: boolean) => this.setState({termsAccepted: checked})}
-                    />
+                    <Layout
+                        style={styles.termsCheckBox}>
+                        <CheckBox
+                            textStyle={styles.termsCheckBoxText}
+                            text='I read and agree to Terms & Conditions'
+                            checked={this.state.termsAccepted}
+                            onChange={(checked: boolean) => this.setState({termsAccepted: checked})}
+                        />
+                    </Layout>
                     <View style={styles.socialAuthContainer}>
                         <Text style={styles.socialAuthHintText}>
                             Sign up with a social account
@@ -227,7 +228,7 @@ export default class SignupScreen extends Component<Props, State> {
                     style={styles.signUpButton}
                     size='giant'
                     onPress={this.onSignUpButtonPress.bind(this)}>
-                    SIGN UP
+                    NEXT >
                 </Button>
                 <Button
                     style={styles.signInButton}

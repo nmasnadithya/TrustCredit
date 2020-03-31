@@ -1,5 +1,5 @@
 import {StackNavigationProp} from "@react-navigation/stack";
-import {AppRoute, RootStackParamList} from "../../navigation.component";
+import {AppRoute, AuthStackParamList} from "../../navigation.component";
 import React, {Component} from "react";
 import {
     Button,
@@ -17,7 +17,7 @@ import {EyeIcon, EyeOffIcon, FacebookIcon, GoogleIcon, PersonIcon, TwitterIcon} 
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {light} from "@eva-design/eva";
 
-type NavigationProp = StackNavigationProp<RootStackParamList, AppRoute.LOGIN>;
+type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.LOGIN>;
 
 type Props = {
     navigation: NavigationProp;
@@ -101,6 +101,10 @@ export default class LoginScreen extends Component<Props, State> {
         this.props.navigation.navigate(AppRoute.SIGNUP);
     }
 
+    onSignInButtonPress() {
+        this.props.navigation.navigate(AppRoute.APP);
+    }
+
     render() {
 
         return (
@@ -178,6 +182,7 @@ export default class LoginScreen extends Component<Props, State> {
                 </Layout>
                 <Button
                     style={styles.signInButton}
+                    onPress={this.onSignInButtonPress.bind(this)}
                     size='giant'>
                     SIGN IN
                 </Button>
