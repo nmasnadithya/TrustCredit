@@ -16,6 +16,8 @@ import { View} from "react-native";
 import {EyeIcon, EyeOffIcon, FacebookIcon, GoogleIcon, PersonIcon, TwitterIcon} from "../../icons/icons";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {light} from "@eva-design/eva";
+import auth from '@react-native-firebase/auth';
+import {Profile} from "../../model/profile";
 
 type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.LOGIN>;
 
@@ -102,7 +104,15 @@ export default class LoginScreen extends Component<Props, State> {
     }
 
     onSignInButtonPress() {
-        this.props.navigation.navigate(AppRoute.APP);
+        auth()
+            .signInWithEmailAndPassword(this.state.email!, this.state.password!)
+            .then(userCredential => {
+                console.log(`Logged in with user ${userCredential.user.email} (${userCredential.user.uid})`)
+                Profile.fetchProfile(userCredential.user.uid);
+                this.props.navigation.navigate(AppRoute.APP);
+            }).catch(reason => {
+                console.log(`Login failed due to ${reason}`)
+        })
     }
 
     render() {
@@ -154,7 +164,7 @@ export default class LoginScreen extends Component<Props, State> {
                         </Button>
                     </View>
                     <Divider/>
-                    <View style={styles.socialAuthContainer}>
+                    {/*<View style={styles.socialAuthContainer}>
                         <Text style={styles.socialAuthHintText}>
                             Sign in with a social account
                         </Text>
@@ -178,7 +188,7 @@ export default class LoginScreen extends Component<Props, State> {
                                 icon={TwitterIcon}
                             />
                         </View>
-                    </View>
+                    </View>*/}
                 </Layout>
                 <Button
                     style={styles.signInButton}

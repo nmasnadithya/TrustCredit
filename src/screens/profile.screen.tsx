@@ -49,7 +49,7 @@ const styles = StyleService.createThemed({
     },
 }, light);
 
-const profile: Profile = Profile.iframIsmath();
+const profile: Profile = Profile.instance;
 
 export default class ProfileScreen extends Component<Props> {
 
@@ -64,7 +64,7 @@ export default class ProfileScreen extends Component<Props> {
                 contentContainerStyle={styles.contentContainer}>
                 <ProfileAvatar
                     style={styles.profileAvatar as ImageStyle}
-                    source={profile.photo}
+                    source={profile.photo!}
                     editButton={() => <Button
                         style={styles.editAvatarButton}
                         status='basic'
@@ -89,7 +89,7 @@ export default class ProfileScreen extends Component<Props> {
                 <ProfileSetting
                     style={styles.profileSetting}
                     hint='Date of Birth'
-                    value={profile.dob.toDateString()}
+                    value={profile.dob?.toDateString()}
                 />
                 <ProfileSetting
                     style={[styles.profileSetting, styles.section]}
@@ -119,7 +119,7 @@ export default class ProfileScreen extends Component<Props> {
                 <ProfileSetting
                     style={styles.profileSetting}
                     hint='Smartphone Purchase Date'
-                    value={profile.smartphonePurchaseDate.toDateString()}
+                    value={profile.smartphonePurchaseDate?.toDateString()}
                 />
                 <ProfileSetting
                     style={styles.profileSetting}

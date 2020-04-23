@@ -12,7 +12,8 @@ export class MyLoan extends LoanOffer {
             loanOffer.amount,
             loanOffer.repayPeriod,
             loanOffer.interestRate,
-            loanOffer.description
+            loanOffer.description,
+            loanOffer.creditScore
         );
     }
 

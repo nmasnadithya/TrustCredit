@@ -4,7 +4,7 @@ import {Avatar, AvatarProps, ButtonElement, ButtonProps, Divider, Layout, Text} 
 
 export interface ProfileSettingProps extends ViewProps {
     hint: string;
-    value: string;
+    value?: string;
 }
 
 export const ProfileSetting = (props: ProfileSettingProps): React.ReactElement => {

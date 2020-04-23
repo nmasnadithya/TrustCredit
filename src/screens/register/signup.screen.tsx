@@ -18,6 +18,11 @@ import {
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
+import {AccessToken, LoginManager} from "react-native-fbsdk";
+import auth from '@react-native-firebase/auth';
+import { GoogleSignin } from "@react-native-community/google-signin";
+import {err} from "react-native-svg/lib/typescript/xml";
+import {Profile} from "../../model/profile";
 
 type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP>;
 
@@ -32,7 +37,7 @@ type State = {
     termsAccepted: boolean,
     passwordVisible: boolean,
     dob?: Date,
-    address?: string,
+    nic?: string,
 };
 const styles = StyleService.createThemed({
     container: {
@@ -103,6 +108,9 @@ export default class SignupScreen extends Component<Props, State> {
             termsAccepted: false,
             passwordVisible: false,
         };
+        GoogleSignin.configure({
+            webClientId: 'AIzaSyBxrpPVOoMUyMj0LUGj0t4lK1jgwnAriUo', // From Firebase Console Settings
+        });
     }
 
     onPasswordIconPress() {
@@ -116,7 +124,55 @@ export default class SignupScreen extends Component<Props, State> {
     }
 
     onSignUpButtonPress() {
-        this.props.navigation.navigate(AppRoute.SIGNUP2);
+        //TODO: validation
+        this.props.navigation.navigate(AppRoute.SIGNUP2, {
+            profile: new Profile(this.state.userName, this.state.email, this.state.dob, (new Date()).getFullYear()-this.state.dob!.getFullYear(), this.state.nic),
+            password: this.state.password!
+        });
+    }
+
+    async onFacebookSignUp() {
+        const result = await LoginManager.logInWithPermissions(['public_profile', 'email', "user_birthday"]);
+
+        console.log(result)
+        if (result.isCancelled) {
+            throw 'User cancelled the login process';
+        }
+        // Once signed in, get the users AccesToken
+        const data = await AccessToken.getCurrentAccessToken();
+
+        if (!data) {
+            throw 'Something went wrong obtaining access token';
+        }
+
+        // Create a Firebase credential with the AccessToken
+        const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+
+        // Sign-in the user with the credential
+        await auth().signInWithCredential(facebookCredential);
+    }
+
+    // Create a Google credential with the token
+    async onGoogleSignUp() {
+        try {
+            await GoogleSignin.hasPlayServices();
+            console.log("Starting Google Auth")
+            const userInfo = await GoogleSignin.signIn();
+            console.log("----------------------------")
+            console.log(userInfo)
+            console.log("----------------------------")
+            const googleCredential = auth.GoogleAuthProvider.credential(userInfo.idToken);
+            console.log("----------------------------")
+            console.log(googleCredential)
+            console.log("----------------------------")
+            let asd = await auth().signInWithCredential(googleCredential);
+            console.log("----------------------------")
+            console.log(asd)
+            console.log("----------------------------")
+        }catch (error) {
+            console.log(error)
+            console.log(error.message)
+        }
     }
 
     render() {
@@ -162,9 +218,9 @@ export default class SignupScreen extends Component<Props, State> {
                         placeholder='NIC'
                         style={styles.emailInput}
                         icon={NICIcon}
-                        value={this.state.address}
+                        value={this.state.nic}
                         onChangeText={text => {
-                            this.setState({address: text})
+                            this.setState({nic: text})
                         }}
                     />
                     <Datepicker
@@ -175,6 +231,8 @@ export default class SignupScreen extends Component<Props, State> {
                             this.setState({dob: date})
                         }}
                         icon={CalendarIcon}
+                        min={new Date("1900/01/01")}
+
                     />
                     <Input
                         style={styles.passwordInput}
@@ -197,7 +255,7 @@ export default class SignupScreen extends Component<Props, State> {
                             onChange={(checked: boolean) => this.setState({termsAccepted: checked})}
                         />
                     </Layout>
-                    <View style={styles.socialAuthContainer}>
+                    {/*<View style={styles.socialAuthContainer}>
                         <Text style={styles.socialAuthHintText}>
                             Sign up with a social account
                         </Text>
@@ -207,12 +265,14 @@ export default class SignupScreen extends Component<Props, State> {
                                 size='giant'
                                 status='basic'
                                 icon={GoogleIcon}
+                                onPress={this.onGoogleSignUp.bind(this)}
                             />
                             <Button
                                 appearance='ghost'
                                 size='giant'
                                 status='basic'
                                 icon={FacebookIcon}
+                                onPress={this.onFacebookSignUp.bind(this)}
                             />
                             <Button
                                 appearance='ghost'
@@ -221,7 +281,7 @@ export default class SignupScreen extends Component<Props, State> {
                                 icon={TwitterIcon}
                             />
                         </View>
-                    </View>
+                    </View>*/}
                 </Layout>
 
                 <Button

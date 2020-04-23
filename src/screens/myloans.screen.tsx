@@ -122,6 +122,7 @@ export default class MyLoansScreen extends Component<Props> {
                     <Text style={styles.activityButton} category='s1'>
                         {`Issued: ${info.item.loanIssued.toLocaleDateString('en-US')}`}
                     </Text>
+                    {/*TODO: fix alignments*/}
                     <Text style={styles.activityButton} category='s1'>
                         {`Settled: ${info.item.loanSettled?.toLocaleDateString('en-US')}`}
                     </Text>

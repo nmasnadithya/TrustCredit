@@ -1,48 +1,64 @@
 import {ImageSourcePropType} from "react-native";
+import firestore from '@react-native-firebase/firestore';
 
 export class Profile {
+    static uid: string;
+    static instance: Profile;
 
-    constructor(readonly fullName: string,
-                readonly nic: string,
-                readonly photo: ImageSourcePropType,
-                readonly dob: Date,
-                readonly email: string,
-                readonly address: string,
-                readonly serviceProvider: string,
-                readonly mobilePackageType: string,
-                readonly mobileNo: string,
-                readonly smartphoneModel: string,
-                readonly smartphonePurchaseDate: Date,
-                readonly educationLevel: string,
-                readonly employmentState: string,
-                readonly employmentDuration: string,
-                readonly monthlyIncome: string,
-                readonly residentialStatus: string,
-                readonly savingsAccount: string,
-                readonly bank: string,
-                readonly branch: string,) {
+    constructor(public fullName?: string,
+                public email?: string,
+                public dob?: Date,
+                public age?: number,
+                public nic?: string,
+                public address?: string,
+                public photo?: ImageSourcePropType,
+                public serviceProvider?: string,
+                public mobilePackageType?: string,
+                public mobileNo?: string,
+                public smartphoneModel?: string,
+                public smartphonePurchaseDate?: Date,
+                public educationLevel?: string,
+                public employmentState?: string,
+                public employmentDuration?: string,
+                public monthlyIncome?: string,
+                public residentialStatus?: string,
+                public savingsAccount?: string,
+                public bank?: string,
+                public branch?: string,
+                readonly creditScore?: number) {
     }
 
-    static iframIsmath(): Profile {
-        return new Profile("Jone Doe",
-            "1234567890V",
-            require("../assets/image-person.png"),
-            new Date("1996-06-12"),
-            "asd@asd.com",
-            "2nd Lane, 1st Road, Random City",
-            "Dialog",
-            "Prepaid",
-            "077 1234567",
-            "Samsung S8",
-            new Date("2019-03-04"),
-            "Diploma/Bachelors",
-            "Employed",
-            "1-3 years",
-            "More than 30,000",
-            "Live in own house",
-            "0987654321",
-            "Random Bank",
-            "Random Branch"
-        );
+    static fetchProfile(uid: string) {
+        this.uid = uid;
+        firestore()
+            .collection('Users')
+            .doc(this.uid)
+            .get()
+            .then(value => {
+                let p = value.data();
+                this.instance = new Profile(
+                    p?.fullName,
+                    p?.email,
+                    p?.dob,
+                    p?.age,
+                    p?.nic,
+                    p?.address,
+                    {uri: p?.photo},
+                    p?.serviceProvider,
+                    p?.mobilePackageType,
+                    p?.mobileNo,
+                    p?.smartphoneModel,
+                    p?.smartphonePurchaseDate,
+                    p?.educationLevel,
+                    p?.employmentState,
+                    p?.employmentDuration,
+                    p?.monthlyIncome,
+                    p?.residentialStatus,
+                    p?.savingsAccount,
+                    p?.bank,
+                    p?.branch,
+                    p?.creditScore,
+                    )
+            })
     }
 }

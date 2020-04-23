@@ -7,23 +7,25 @@ import {
     Datepicker,
     Input,
     Layout,
-    Select, SelectOption,
+    Select, SelectOption, SelectOptionType,
     StyleService,
     Text
 } from "@ui-kitten/components";
 import {ImageStyle, View} from "react-native";
 import {
-    AddressIcon, CalendarIcon,
+    AddressIcon, CalendarIcon, ClockIcon, MoneyIcon,
     PhoneIcon, SmartPhoneIcon,
 } from "../../icons/icons";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
+import {RouteProp} from "@react-navigation/native";
 
 type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP3>;
 
 type Props = {
     navigation: NavigationProp;
+    route: RouteProp<AuthStackParamList, AppRoute.SIGNUP2>;
 };
 
 type State = {
@@ -31,8 +33,10 @@ type State = {
     phonePurchase?: Date,
     educationLevel?: SelectOption,
     employment?: SelectOption
-    employmentDuration?: SelectOption
-    monthlyIncome?: SelectOption
+    employmentDuration?: string
+    employmentDurationValidation: boolean
+    monthlyIncome?: string
+    monthlyIncomeValidation: boolean
     residentialStatus?: SelectOption
 };
 const styles = StyleService.createThemed({
@@ -126,21 +130,34 @@ const incomeSelect = [
 
 const residentialSelect = [
     { text: 'Parents' },
-    { text: 'Rented' },
+    { text: 'Rent' },
     { text: 'Own' },
-    { text: 'Other' },
 ];
 
 export default class SignupScreen3 extends Component<Props, State> {
 
     constructor(props: Readonly<Props>) {
         super(props);
+        console.log(this.props.route.params.profile)
         this.state = {
+            employmentDurationValidation: false,
+            monthlyIncomeValidation: false
         };
     }
 
     onSignUpButtonPress() {
-        this.props.navigation.navigate(AppRoute.SIGNUP4);
+        let profile = this.props.route.params.profile;
+        profile.smartphoneModel = this.state.phoneModel;
+        profile.smartphonePurchaseDate = this.state.phonePurchase;
+        profile.educationLevel = (this.state.educationLevel as SelectOptionType).text;
+        profile.employmentState = (this.state.employment as SelectOptionType).text;
+        profile.employmentDuration = this.state.employmentDuration;
+        profile.monthlyIncome = this.state.monthlyIncome;
+        profile.residentialStatus = (this.state.residentialStatus as SelectOptionType).text;
+        this.props.navigation.navigate(AppRoute.SIGNUP4, {
+            profile: profile,
+            password: this.props.route.params.password
+        });
     }
 
     render() {
@@ -190,25 +207,43 @@ export default class SignupScreen3 extends Component<Props, State> {
                             this.setState({employment: option})
                         }}
                     />
-                    <Select
+                    <Input
                         style={styles.emailInput}
-                        placeholder='Time in current job'
-                        data={employmentDurationSelect}
-                        selectedOption={this.state.employmentDuration}
-                        disabled={this.state.employment != employmentSelect[2]}
-                        onSelect={option => {
-                            this.setState({employmentDuration: option})
+                        placeholder='Time in current job(years)'
+                        disabled={this.state.employment == employmentSelect[0]}
+                        value = {this.state.employmentDuration}
+                        onChangeText={text => {
+                            this.setState({
+                                employmentDuration: text,
+                                employmentDurationValidation: this.state.employment != undefined &&
+                                    this.state.employment != employmentSelect[0] &&
+                                    this.state.employmentDuration != undefined &&
+                                    this.state.employmentDuration.length > 0 &&
+                                    isNaN(parseFloat(this.state.employmentDuration))
+                            })
                         }}
+                        caption={this.state.employmentDurationValidation ? 'Enter valid value' : ''}
+                        status={this.state.employmentDurationValidation ? 'danger': ''}
+                        icon={ClockIcon}
                     />
-                    <Select
+                    <Input
                         style={styles.emailInput}
-                        placeholder='Monthly income'
-                        data={incomeSelect}
-                        selectedOption={this.state.monthlyIncome}
-                        disabled={this.state.employment != employmentSelect[2]}
-                        onSelect={option => {
-                            this.setState({monthlyIncome: option})
+                        placeholder='Monthly income(LKR)'
+                        disabled={this.state.employment == employmentSelect[0]}
+                        value = {this.state.monthlyIncome}
+                        onChangeText={text => {
+                            this.setState({
+                                monthlyIncome: text,
+                                monthlyIncomeValidation: this.state.employment != undefined &&
+                                    this.state.employment != employmentSelect[0] &&
+                                    this.state.monthlyIncome != undefined &&
+                                    this.state.monthlyIncome.length > 0 &&
+                                    isNaN(parseInt(this.state.monthlyIncome))
+                            })
                         }}
+                        caption={this.state.monthlyIncomeValidation ? 'Enter valid amount' : ''}
+                        status={this.state.monthlyIncomeValidation ? 'danger': ''}
+                        icon={MoneyIcon}
                     />
                     <Select
                         style={styles.emailInput}

@@ -16,8 +16,8 @@ import {BellIcon, FaqIcon, HomeIcon, LoansIcon, LogOutIcon, OffersIcon, PersonIc
 import LoanOffersScreen from "./screens/loanoffers.screen";
 import ContactScreen from "./screens/contactus.screen";
 import ProfileScreen from "./screens/profile.screen";
-import {LoanOffer} from "./model/loanOffer";
 import LoanDetailsScreen, {RouteParams as OfferDetailsProps} from "./screens/loandetails.screen";
+import {Profile} from "./model/profile";
 
 export enum AppRoute {
     AUTH = 'Auth',
@@ -63,9 +63,9 @@ export type AuthStackParamList = AppNavigatorParams & {
     [AppRoute.LOGIN]: undefined;
     [AppRoute.WELCOME]: undefined;
     [AppRoute.SIGNUP]: undefined;
-    [AppRoute.SIGNUP2]: undefined;
-    [AppRoute.SIGNUP3]: undefined;
-    [AppRoute.SIGNUP4]: undefined;
+    [AppRoute.SIGNUP2]: { profile: Profile, password: string };
+    [AppRoute.SIGNUP3]: { profile: Profile, password: string };
+    [AppRoute.SIGNUP4]: { profile: Profile, password: string };
     [AppRoute.GUIDE]: undefined;
 };
 

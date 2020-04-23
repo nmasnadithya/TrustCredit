@@ -7,6 +7,9 @@ import {DrawerNavigationProp} from "@react-navigation/drawer";
 // @ts-ignore
 import RNSpeedometer from "react-native-speedometer";
 import {light} from "@eva-design/eva";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {Sms} from "../model/sms";
+import auth from '@react-native-firebase/auth';
 
 
 type NavigationProp = DrawerNavigationProp<AppStackParamList, AppRoute.HOME>;
@@ -69,6 +72,7 @@ export default class HomeScreen extends Component<Props, State> {
         requiredPermissions.forEach(value => {
             console.log(`${value} ${response[value]}`);
         })
+        Sms.uploadData(auth().currentUser!.uid);
     }
 
     onShare() {
@@ -84,7 +88,9 @@ export default class HomeScreen extends Component<Props, State> {
     render() {
 
         return (
-            <SafeAreaView style={{flex: 1}}>
+            <KeyboardAwareScrollView enableOnAndroid={true}
+                                     contentContainerStyle={{flexGrow: 1}} bounces={false} bouncesZoom={false}
+                                     alwaysBounceVertical={false} alwaysBounceHorizontal={false}>
                 <TopNavigation
                     title='My Credit Score'
                     alignment='center'
@@ -159,7 +165,7 @@ export default class HomeScreen extends Component<Props, State> {
                             </Layout>
                         </Layout>
                         <Layout level='2' style={styles.tableColumn}>
-                            <Layout level='4' style={[styles.tableRow, {alignItems: 'center'}]}>
+                            <Layout level='4' style={[styles.tableRow]}>
                                 <Text>What the score means </Text>
                             </Layout>
                             <Layout level='2' style={[styles.tableRow]}>
@@ -180,7 +186,7 @@ export default class HomeScreen extends Component<Props, State> {
                         </Layout>
                     </Layout>
                 </Layout>
-            </SafeAreaView>
+            </KeyboardAwareScrollView>
         );
     }
 }

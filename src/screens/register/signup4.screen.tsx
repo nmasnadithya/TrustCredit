@@ -7,7 +7,7 @@ import {
     Datepicker,
     Input,
     Layout,
-    Select, SelectOption,
+    Select, SelectOption, SelectOptionType,
     StyleService,
     Text
 } from "@ui-kitten/components";
@@ -19,11 +19,16 @@ import {
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
+import {RouteProp} from "@react-navigation/native";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {Profile} from "../../model/profile";
 
 type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP4>;
 
 type Props = {
     navigation: NavigationProp;
+    route: RouteProp<AuthStackParamList, AppRoute.SIGNUP2>;
 };
 
 type State = {
@@ -108,12 +113,43 @@ export default class SignupScreen4 extends Component<Props, State> {
 
     constructor(props: Readonly<Props>) {
         super(props);
+        console.log(this.props.route.params.profile)
         this.state = {
         };
     }
 
     onSignUpButtonPress() {
-        this.props.navigation.navigate(AppRoute.APP);
+        let profile = this.props.route.params.profile;
+        profile.savingsAccount = this.state.accountNo;
+        profile.bank = (this.state.bank as SelectOptionType).text;
+        profile.branch = this.state.branch;
+
+        auth()
+            .createUserWithEmailAndPassword(profile.email!, this.props.route.params.password)
+            .then(userCredential => {
+                console.log('User account created on auth');
+                firestore()
+                    .collection('Users')
+                    .doc(userCredential.user.uid)
+                    .set(profile)
+                    .then(a => {
+                        console.log('Added User Account details');
+                        Profile.instance = profile;
+                        this.props.navigation.navigate(AppRoute.APP);
+                    })
+            })
+            .catch(error => {
+                if (error.code === 'auth/email-already-in-use') {
+                    console.log('That email address is already in use!');
+                }
+
+                if (error.code === 'auth/invalid-email') {
+                    console.log('That email address is invalid!');
+                }
+
+                console.error(error);
+            });
+
     }
 
     render() {

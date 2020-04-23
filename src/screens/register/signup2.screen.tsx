@@ -1,5 +1,5 @@
 import {StackNavigationProp} from "@react-navigation/stack";
-import {AppRoute, AuthStackParamList} from "../../navigation.component";
+import {AppRoute, AppStackParamList, AuthStackParamList} from "../../navigation.component";
 import React, {Component} from "react";
 import {
     Button,
@@ -7,7 +7,7 @@ import {
     Datepicker,
     Input,
     Layout,
-    Select, SelectOption,
+    Select, SelectOption, SelectOptionType,
     StyleService,
     Text
 } from "@ui-kitten/components";
@@ -19,11 +19,14 @@ import {
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
+import {Profile} from "../../model/profile";
+import {RouteProp} from "@react-navigation/native";
 
 type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP2>;
 
 type Props = {
-    navigation: NavigationProp;
+    navigation: NavigationProp
+    route: RouteProp<AuthStackParamList, AppRoute.SIGNUP2>;
 };
 
 type State = {
@@ -115,12 +118,21 @@ export default class SignupScreen2 extends Component<Props, State> {
 
     constructor(props: Readonly<Props>) {
         super(props);
+        console.log(this.props.route.params.profile)
         this.state = {
         };
     }
 
     onSignUpButtonPress() {
-        this.props.navigation.navigate(AppRoute.SIGNUP3);
+        let profile = this.props.route.params.profile;
+        profile.address = this.state.address;
+        profile.serviceProvider = (this.state.serviceProvider as SelectOptionType).text;
+        profile.mobilePackageType = (this.state.mobilePackage as SelectOptionType).text;
+        profile.mobileNo = this.state.address;
+        this.props.navigation.navigate(AppRoute.SIGNUP3, {
+            profile: profile,
+            password: this.props.route.params.password
+        });
     }
 
     render() {

@@ -18,6 +18,7 @@ import 'react-native-gesture-handler';
 import {Navigator} from "./navigation.component";
 import {MaterialIconsPack} from "./icons/material.icons";
 import {Material2IconsPack} from "./icons/material2.icons";
+import { GoogleSignin } from '@react-native-community/google-signin';
 
 /**
  * Use any valid `name` property from eva icons (e.g `github`, or `heart-outline`)

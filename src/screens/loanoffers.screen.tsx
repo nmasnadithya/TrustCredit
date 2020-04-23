@@ -15,11 +15,15 @@ import {DrawerNavigationProp} from "@react-navigation/drawer";
 import {LoanOffer} from "../model/loanOffer";
 import {light} from "@eva-design/eva";
 import {ClockIcon, InterestIcon, MenuIcon, MoneyIcon} from "../icons/icons";
+import {Profile} from "../model/profile";
 
 type NavigationProp = DrawerNavigationProp<AppStackParamList, AppRoute.LOAN_OFFERS>;
 
 type Props = {
     navigation: NavigationProp;
+};
+type State = {
+    offers: LoanOffer[],
 };
 
 const styles = StyleService.createThemed({
@@ -44,18 +48,20 @@ const styles = StyleService.createThemed({
     },
 }, light);
 
-const offers: LoanOffer[] = [
-    LoanOffer.offer1(),
-    LoanOffer.offer2(),
-    LoanOffer.offer3(),
-    LoanOffer.offer4(),
-    LoanOffer.offer1(),
-    LoanOffer.offer2(),
-    LoanOffer.offer3(),
-    LoanOffer.offer4(),
-];
+export default class LoanOffersScreen extends Component<Props, State> {
+    offers: LoanOffer[] = []
 
-export default class LoanOffersScreen extends Component<Props> {
+    constructor(props: Readonly<Props>) {
+        super(props);
+        this.state = {
+            offers: []
+        }
+        LoanOffer.getOffers(Profile.instance.creditScore).then(value => {
+            this.setState({
+                offers: value
+            })
+        })
+    }
 
     navigateBack() {
         this.props.navigation.goBack();
@@ -114,7 +120,7 @@ export default class LoanOffersScreen extends Component<Props> {
                 <Divider/>
                 <List
                     style={styles.list}
-                    data={offers}
+                    data={this.state.offers}
                     renderItem={this.renderItem.bind(this)}
                 />
             </SafeAreaView>

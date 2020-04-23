@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "898610012608",
+    "firebase_url": "https://trust-credit.firebaseio.com",
+    "project_id": "trust-credit",
+    "storage_bucket": "trust-credit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898610012608:android:4f7058945b017cae14a825",
+        "android_client_info": {
+          "package_name": "com.trustcredit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "898610012608-o18ktmvelqpu1dh2c6crh0c639n1a0bj.apps.googleusercontent.com",
+          "client_type": 3,
+          "android_info": {
+            "package_name": "com.trustcredit",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "898610012608-08pm3f9fkqvsq4l97aglm2lnisu11od3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAS7To155_9jWgzd0mHNuWiNQfyPaGdgj4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "898610012608-08pm3f9fkqvsq4l97aglm2lnisu11od3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
