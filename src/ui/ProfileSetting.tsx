@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, ViewProps } from 'react-native';
-import {Avatar, AvatarProps, ButtonElement, ButtonProps, Divider, Layout, Text} from '@ui-kitten/components';
+import {StyleSheet, ViewProps} from 'react-native';
+import {Divider, Layout, Text} from '@ui-kitten/components';
 
 export interface ProfileSettingProps extends ViewProps {
     hint: string;
@@ -9,7 +9,7 @@ export interface ProfileSettingProps extends ViewProps {
 
 export const ProfileSetting = (props: ProfileSettingProps): React.ReactElement => {
 
-    const { style, hint, value, ...layoutProps } = props;
+    const {style, hint, value, ...layoutProps} = props;
 
     return (
         <React.Fragment>
@@ -23,7 +23,7 @@ export const ProfileSetting = (props: ProfileSettingProps): React.ReactElement =
                     {hint}
                 </Text>
                 <Text category='s1'>
-                    {value}
+                    {value ? value : "-"}
                 </Text>
             </Layout>
             <Divider/>

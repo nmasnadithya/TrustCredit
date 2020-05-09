@@ -1,28 +1,17 @@
 import {StackNavigationProp} from "@react-navigation/stack";
 import {AppRoute, AuthStackParamList} from "../../navigation.component";
 import React, {Component} from "react";
-import {Button, CheckBox, Datepicker, Input, Layout, StyleService, Text} from "@ui-kitten/components";
-import {ImageStyle, View} from "react-native";
-import {
-    AddressIcon,
-    CalendarIcon,
-    EmailIcon,
-    EyeIcon,
-    EyeOffIcon,
-    FacebookIcon,
-    GoogleIcon, NICIcon,
-    PersonIcon,
-    PlusIcon,
-    TwitterIcon
-} from "../../icons/icons";
+import {Button, CheckBox, Datepicker, Input, Layout, StyleService} from "@ui-kitten/components";
+import {ImageStyle, ImageURISource, PermissionsAndroid, View} from "react-native";
+import {CalendarIcon, EmailIcon, EyeIcon, EyeOffIcon, NICIcon, PersonIcon, PlusIcon} from "../../icons/icons";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
 import {AccessToken, LoginManager} from "react-native-fbsdk";
 import auth from '@react-native-firebase/auth';
-import { GoogleSignin } from "@react-native-community/google-signin";
-import {err} from "react-native-svg/lib/typescript/xml";
+import {GoogleSignin} from "@react-native-community/google-signin";
 import {Profile} from "../../model/profile";
+import ImagePicker from 'react-native-image-picker';
 
 type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP>;
 
@@ -38,6 +27,7 @@ type State = {
     passwordVisible: boolean,
     dob?: Date,
     nic?: string,
+    avatarSource: ImageURISource
 };
 const styles = StyleService.createThemed({
     container: {
@@ -107,6 +97,7 @@ export default class SignupScreen extends Component<Props, State> {
         this.state = {
             termsAccepted: false,
             passwordVisible: false,
+            avatarSource: require('../../assets/image-person.png')
         };
         GoogleSignin.configure({
             webClientId: 'AIzaSyBxrpPVOoMUyMj0LUGj0t4lK1jgwnAriUo', // From Firebase Console Settings
@@ -125,10 +116,26 @@ export default class SignupScreen extends Component<Props, State> {
 
     onSignUpButtonPress() {
         //TODO: validation
-        this.props.navigation.navigate(AppRoute.SIGNUP2, {
-            profile: new Profile(this.state.userName, this.state.email, this.state.dob, (new Date()).getFullYear()-this.state.dob!.getFullYear(), this.state.nic),
-            password: this.state.password!
+        ImagePicker.showImagePicker({
+            title: 'Upload NIC'
+        }, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled NIC image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            } else {
+                //TODO: upload
+                this.props.navigation.navigate(AppRoute.SIGNUP2, {
+                    profile: new Profile(this.state.userName, this.state.email, this.state.dob, (new Date()).getFullYear() - this.state.dob!.getFullYear(), this.state.nic),
+                    password: this.state.password!
+                });
+            }
         });
+
     }
 
     async onFacebookSignUp() {
@@ -169,10 +176,35 @@ export default class SignupScreen extends Component<Props, State> {
             console.log("----------------------------")
             console.log(asd)
             console.log("----------------------------")
-        }catch (error) {
+        } catch (error) {
             console.log(error)
             console.log(error.message)
         }
+    }
+
+    onProfileImage() {
+        ImagePicker.showImagePicker({
+            title: 'Select Profile Picture'
+        }, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            } else {
+                const source = {uri: response.uri};
+
+                // You can also display the image using data:
+                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                this.setState({
+                    avatarSource: source,
+                });
+            }
+        });
     }
 
     render() {
@@ -183,11 +215,12 @@ export default class SignupScreen extends Component<Props, State> {
                 <View style={styles.headerContainer}>
                     <ProfileAvatar
                         style={styles.profileAvatar as ImageStyle}
-                        source={require('../../assets/image-person.png')}
+                        source={this.state.avatarSource}
                         editButton={() => <Button
                             style={styles.editAvatarButton}
                             status='basic'
                             icon={PlusIcon}
+                            onPress={this.onProfileImage.bind(this)}
                         />}
                     />
                 </View>

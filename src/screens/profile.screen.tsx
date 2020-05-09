@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ImageStyle, ScrollView} from 'react-native';
+import {ImageSourcePropType, ImageStyle, ImageURISource, ScrollView} from 'react-native';
 import {Button, Icon, StyleService} from '@ui-kitten/components';
 import {AppRoute, AppStackParamList} from "../navigation.component";
 import {DrawerNavigationProp} from "@react-navigation/drawer";
@@ -7,7 +7,8 @@ import {ProfileAvatar} from "../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
 import {ProfileSetting} from "../ui/ProfileSetting";
 import {Profile} from "../model/profile";
-import {CameraIcon} from "../icons/icons";
+import {CameraIcon, PersonIcon} from "../icons/icons";
+import ImagePicker from "react-native-image-picker";
 
 const BackIcon = (style: ImageStyle) => (
     <Icon {...style} name='arrow-back'/>
@@ -17,6 +18,9 @@ type NavigationProp = DrawerNavigationProp<AppStackParamList, AppRoute.PROFILE>;
 
 type Props = {
     navigation: NavigationProp;
+};
+type State = {
+    avatarSource: ImageURISource;
 };
 
 const styles = StyleService.createThemed({
@@ -49,26 +53,62 @@ const styles = StyleService.createThemed({
     },
 }, light);
 
-const profile: Profile = Profile.instance;
 
-export default class ProfileScreen extends Component<Props> {
+export default class ProfileScreen extends Component<Props, State> {
+
+
+    constructor(props: Readonly<Props>) {
+        super(props);
+        this.state = {
+            avatarSource: require('../assets/image-person2.png')
+        }
+    }
 
     navigateBack() {
         this.props.navigation.goBack();
     }
 
+    onProfileImage() {
+        ImagePicker.showImagePicker({
+            title: 'Select Profile Picture'
+        }, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            } else {
+                const source = {uri: response.uri};
+
+                // You can also display the image using data:
+                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                this.setState({
+                    avatarSource: source,
+                });
+            }
+        });
+    }
+
     render() {
+        const profile: Profile = Profile.instance;
+        console.log(profile)
+
         return (
             <ScrollView
                 style={styles.container}
                 contentContainerStyle={styles.contentContainer}>
                 <ProfileAvatar
                     style={styles.profileAvatar as ImageStyle}
-                    source={profile.photo!}
+                    source={this.state.avatarSource}
                     editButton={() => <Button
                         style={styles.editAvatarButton}
                         status='basic'
                         icon={CameraIcon}
+                        onPress={this.onProfileImage.bind(this)}
                     />}
                 />
                 <ProfileSetting
@@ -119,7 +159,7 @@ export default class ProfileScreen extends Component<Props> {
                 <ProfileSetting
                     style={styles.profileSetting}
                     hint='Smartphone Purchase Date'
-                    value={profile.smartphonePurchaseDate?.toDateString()}
+                    value={profile.smartphonePurchaseDate}
                 />
                 <ProfileSetting
                     style={styles.profileSetting}

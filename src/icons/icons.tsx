@@ -93,3 +93,6 @@ export const InterestIcon = (style: ImageStyle): IconElement => (
 export const ShareIcon = (style: ImageStyle): IconElement => (
     <Icon {...style} name='share' pack='eva'/>
 );
+export const HistoryIcon = (style: ImageStyle): IconElement => (
+    <Icon {...style} name='activity-outline' pack='eva'/>
+);

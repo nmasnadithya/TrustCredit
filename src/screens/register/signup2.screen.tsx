@@ -128,7 +128,7 @@ export default class SignupScreen2 extends Component<Props, State> {
         profile.address = this.state.address;
         profile.serviceProvider = (this.state.serviceProvider as SelectOptionType).text;
         profile.mobilePackageType = (this.state.mobilePackage as SelectOptionType).text;
-        profile.mobileNo = this.state.address;
+        profile.mobileNo = this.state.mobileNumber;
         this.props.navigation.navigate(AppRoute.SIGNUP3, {
             profile: profile,
             password: this.props.route.params.password

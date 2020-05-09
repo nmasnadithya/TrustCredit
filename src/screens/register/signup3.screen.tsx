@@ -30,7 +30,7 @@ type Props = {
 
 type State = {
     phoneModel?: string,
-    phonePurchase?: Date,
+    phonePurchase?: SelectOption,
     educationLevel?: SelectOption,
     employment?: SelectOption
     employmentDuration?: string
@@ -116,10 +116,18 @@ const employmentSelect = [
     { text: 'Employed' },
 ];
 
-const employmentDurationSelect = [
-    { text: 'Less than 1 year' },
-    { text: '1 - 3 years' },
-    { text: 'More than 3 years' },
+const smartPhonePurchaseSelect = [
+    { text: '2020' },
+    { text: '2019' },
+    { text: '2018' },
+    { text: '2017' },
+    { text: '2016' },
+    { text: '2015' },
+    { text: '2014' },
+    { text: '2013' },
+    { text: '2012' },
+    { text: '2011' },
+    { text: '2010' },
 ];
 
 const incomeSelect = [
@@ -148,7 +156,7 @@ export default class SignupScreen3 extends Component<Props, State> {
     onSignUpButtonPress() {
         let profile = this.props.route.params.profile;
         profile.smartphoneModel = this.state.phoneModel;
-        profile.smartphonePurchaseDate = this.state.phonePurchase;
+        profile.smartphonePurchaseDate = (this.state.phonePurchase as SelectOptionType).text;
         profile.educationLevel = (this.state.educationLevel as SelectOptionType).text;
         profile.employmentState = (this.state.employment as SelectOptionType).text;
         profile.employmentDuration = this.state.employmentDuration;
@@ -179,15 +187,14 @@ export default class SignupScreen3 extends Component<Props, State> {
                             this.setState({phoneModel: text})
                         }}
                     />
-                    <Datepicker
-                        placeholder='Smartphone Purchase Date'
+                    <Select
                         style={styles.emailInput}
-                        date={this.state.phonePurchase}
-                        onSelect={date => {
-                            this.setState({phonePurchase: date})
+                        placeholder='Smartphone Purchase Date'
+                        data={smartPhonePurchaseSelect}
+                        selectedOption={this.state.phonePurchase}
+                        onSelect={option => {
+                            this.setState({phonePurchase: option})
                         }}
-                        icon={CalendarIcon}
-                        min={new Date("2015-01-01")}
                     />
                     <Select
                         style={styles.emailInput}

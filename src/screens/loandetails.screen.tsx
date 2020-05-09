@@ -5,19 +5,20 @@ import {
     Divider,
     Icon,
     Layout,
-    List,
+    Modal,
+    Spinner,
     StyleService,
     Text,
     TopNavigation,
     TopNavigationAction
 } from '@ui-kitten/components';
-import {StackNavigationProp} from "@react-navigation/stack";
 import {AppRoute, AppStackParamList} from "../navigation.component";
 import {DrawerNavigationProp} from "@react-navigation/drawer";
 import {LoanOffer} from "../model/loanOffer";
 import {light} from "@eva-design/eva";
-import { RouteProp } from '@react-navigation/native';
+import {RouteProp} from '@react-navigation/native';
 import {addDays} from "../utils/dateutils";
+import {Profile} from "../model/profile";
 
 const BackIcon = (style: ImageStyle) => (
     <Icon {...style} name='arrow-back'/>
@@ -30,7 +31,12 @@ type ScreenProps = {
     route: RouteProp<AppStackParamList, AppRoute.LOAN_DETAILS>;
 };
 export type RouteParams = {
-    offer: LoanOffer
+    offer: LoanOffer,
+};
+
+type State = {
+    showModal: boolean,
+    modalMessage?: string,
 };
 
 const styles = StyleService.createThemed({
@@ -45,7 +51,7 @@ const styles = StyleService.createThemed({
     },
     cardItem: {
         margin: 8,
-        height: 360,
+        height: 480,
         padding: 24,
         borderRadius: 4,
         backgroundColor: 'color-primary-default',
@@ -106,13 +112,47 @@ const styles = StyleService.createThemed({
     },
     dividerStyle: {
         marginVertical: 8
-    }
+    },
+    backdrop: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 256,
+        padding: 32,
+    },
 }, light);
 
-export default class LoanDetailsScreen extends Component<ScreenProps> {
+export default class LoanDetailsScreen extends Component<ScreenProps, State> {
+
+
+    constructor(props: Readonly<ScreenProps>) {
+        super(props);
+        this.state = {
+            showModal: false,
+            modalMessage: undefined,
+        }
+    }
 
     navigateBack() {
         this.props.navigation.goBack();
+    }
+
+    onApply() {
+
+        let offer = this.props.route.params.offer;
+        let profile = Profile.instance;
+        let url = `https://us-central1-trust-credit.cloudfunctions.net/sendMail?to=${offer.email}&nic=${profile.nic}&id=${offer.id}&amount=${offer.amount}&interest=${offer.interestRate}&period=${offer.repayPeriod}&bank=${profile.bank}&branch=${profile.branch}&accountNo=${profile.savingsAccount}&name=${profile.fullName}`;
+        this.setState({showModal: true})
+        fetch(url)
+            .then((response) => {
+                this.setState({modalMessage: "Loan Requested Successfully!"})
+                console.log(response)
+            })
+            .catch((error) => {
+                this.setState({modalMessage: error})
+            });
     }
 
     render() {
@@ -147,7 +187,12 @@ export default class LoanDetailsScreen extends Component<ScreenProps> {
                             status='control'>
                             {offer.bank}
                         </Text>
-                        <View style={{flex:1, alignItems: 'stretch', justifyContent:'space-between', flexDirection: 'column'}}>
+                        <View style={{
+                            flex: 1,
+                            alignItems: 'stretch',
+                            justifyContent: 'space-between',
+                            flexDirection: 'column'
+                        }}>
                             <View style={styles.itemContainer}>
                                 <Text
                                     category='s1'
@@ -165,7 +210,7 @@ export default class LoanDetailsScreen extends Component<ScreenProps> {
                                     style={styles.cardDetailsLabel}
                                     category='s1'
                                     status='control'>
-                                    {`Interest (${offer.interestRate*100}%)`}
+                                    {`Interest (${offer.interestRate * 100}%)`}
                                 </Text>
                                 <Text
                                     category='s1'
@@ -225,11 +270,39 @@ export default class LoanDetailsScreen extends Component<ScreenProps> {
                     </View>
                     <Layout style={styles.buyButtonContainer}>
                         <Button
-                            size='giant'>
+                            size='giant'
+                            onPress={this.onApply.bind(this)}>
                             APPLY
                         </Button>
                     </Layout>
                 </React.Fragment>
+                <Modal
+                    backdropStyle={styles.backdrop}
+                    onBackdropPress={() => {
+                    }}
+                    visible={this.state.showModal}>
+                    <Layout
+                        level='3'
+                        style={styles.modalContainer}>
+                        {this.state.modalMessage &&
+                        <>
+                            <Text style={{textAlign: 'center'}} category='h4'>{this.state.modalMessage}</Text>
+                            <Button onPress={event => {
+                                this.setState({showModal: false});
+                                this.navigateBack();
+                            }}>
+                                DISMISS
+                            </Button>
+                        </>
+                        }
+                        {this.state.modalMessage == undefined &&
+                        <>
+                            <Spinner size='giant'/>
+                            <Text category='h4'>Requesting Loan</Text>
+                        </>
+                        }
+                    </Layout>
+                </Modal>
             </SafeAreaView>
         );
     }

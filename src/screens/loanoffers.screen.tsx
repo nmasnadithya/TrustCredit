@@ -3,8 +3,10 @@ import {ImageBackground, ListRenderItemInfo, SafeAreaView, View} from 'react-nat
 import {
     Button,
     Card,
-    Divider, Layout,
-    List, Spinner,
+    Divider,
+    Layout,
+    List,
+    Modal,
     StyleService,
     Text,
     TopNavigation,
@@ -24,6 +26,7 @@ type Props = {
 };
 type State = {
     offers: LoanOffer[],
+    showModal: boolean,
 };
 
 const styles = StyleService.createThemed({
@@ -46,6 +49,15 @@ const styles = StyleService.createThemed({
         marginHorizontal: 4,
         paddingHorizontal: 0,
     },
+    backdrop: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 256,
+        padding: 32,
+    },
 }, light);
 
 export default class LoanOffersScreen extends Component<Props, State> {
@@ -54,7 +66,8 @@ export default class LoanOffersScreen extends Component<Props, State> {
     constructor(props: Readonly<Props>) {
         super(props);
         this.state = {
-            offers: []
+            offers: [],
+            showModal: false
         }
         LoanOffer.getOffers(Profile.instance.creditScore).then(value => {
             this.setState({
@@ -68,9 +81,13 @@ export default class LoanOffersScreen extends Component<Props, State> {
     }
 
     openOffer(offer: LoanOffer) {
-        this.props.navigation.navigate(AppRoute.LOAN_DETAILS, {
-            offer: offer
-        });
+        if (Profile.instance.creditScore) {
+            this.props.navigation.navigate(AppRoute.LOAN_DETAILS, {
+                offer: offer
+            });
+        } else {
+            this.setState({showModal: true});
+        }
     }
 
     renderItem(info: ListRenderItemInfo<LoanOffer>): React.ReactElement {
@@ -116,13 +133,24 @@ export default class LoanOffersScreen extends Component<Props, State> {
     render() {
         return (
             <SafeAreaView style={{flex: 1}}>
-                <TopNavigation title='Loan Offers' alignment='center' leftControl={<TopNavigationAction icon={MenuIcon} onPress={this.props.navigation.toggleDrawer}/>}/>
+                <TopNavigation title='Loan Offers' alignment='center' leftControl={<TopNavigationAction icon={MenuIcon}
+                                                                                                        onPress={this.props.navigation.toggleDrawer}/>}/>
                 <Divider/>
                 <List
                     style={styles.list}
                     data={this.state.offers}
                     renderItem={this.renderItem.bind(this)}
                 />
+                <Modal
+                    backdropStyle={styles.backdrop}
+                    onBackdropPress={() => this.setState({showModal: false})}
+                    visible={this.state.showModal}>
+                    <Layout
+                        level='3'
+                        style={styles.modalContainer}>
+                        <Text style={{textAlign: 'center'}} category='h4' status='danger'>Your credit score is being calculated!</Text>
+                    </Layout>
+                </Modal>
             </SafeAreaView>
 
         );

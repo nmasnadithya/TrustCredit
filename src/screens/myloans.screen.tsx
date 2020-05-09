@@ -3,10 +3,11 @@ import {ImageBackground, ImageStyle, ListRenderItemInfo, SafeAreaView, StyleShee
 import {
     Button,
     Card,
-    Divider,
     Icon,
-    List,
+    Layout, List,
     StyleService,
+    Tab,
+    TabView,
     Text,
     TopNavigation,
     TopNavigationAction
@@ -14,7 +15,7 @@ import {
 import {AppRoute, AppStackParamList} from "../navigation.component";
 import {DrawerNavigationProp} from "@react-navigation/drawer";
 import {light} from "@eva-design/eva";
-import {ClockIcon, InterestIcon, LogInIcon, LogOutIcon, MenuIcon, MoneyIcon} from "../icons/icons";
+import {InterestIcon, MenuIcon, MoneyIcon} from "../icons/icons";
 import {MyLoan} from "../model/myLoans";
 
 const BackIcon = (style: ImageStyle) => (
@@ -25,6 +26,10 @@ type NavigationProp = DrawerNavigationProp<AppStackParamList, AppRoute.MY_LOANS>
 
 type Props = {
     navigation: NavigationProp;
+};
+
+type State = {
+    selectedIndex: number,
 };
 
 const styles = StyleService.createThemed({
@@ -52,6 +57,9 @@ const styles = StyleService.createThemed({
         marginHorizontal: 4,
         paddingHorizontal: 0,
     },
+    tabContainer: {
+        minHeight: '96%',
+    },
 }, light);
 
 const offers: MyLoan[] = [
@@ -59,16 +67,22 @@ const offers: MyLoan[] = [
     MyLoan.offer2(),
     MyLoan.offer3(),
     MyLoan.offer4(),
-    MyLoan.offer1(),
     MyLoan.offer2(),
     MyLoan.offer3(),
-    MyLoan.offer4(),
 ];
 
-export default class MyLoansScreen extends Component<Props> {
+export default class MyLoansScreen extends Component<Props, State> {
+
+
+    constructor(props: Readonly<Props>) {
+        super(props);
+        this.state = {
+            selectedIndex: 0,
+        }
+    }
 
     renderHeader(info: ListRenderItemInfo<MyLoan>): React.ReactElement {
-        if(info.item.loanSettled) {
+        if (info.item.loanSettled) {
             return (
                 <View style={styles.itemHeader}>
                     <ImageBackground
@@ -101,7 +115,7 @@ export default class MyLoansScreen extends Component<Props> {
     }
 
     renderFooter(info: ListRenderItemInfo<MyLoan>): React.ReactElement {
-        if(info.item.loanSettled) {
+        if (info.item.loanSettled) {
             return (
                 <View style={styles.itemFooter}>
                     <Button
@@ -129,6 +143,11 @@ export default class MyLoansScreen extends Component<Props> {
                 </View>
             );
         } else {
+            let dueDate = new Date(info.item.loanIssued);
+            console.log(`date: ${dueDate.getDate()}`)
+            console.log(`period: ${info.item.repayPeriod}`)
+            console.log(`total dates: ${dueDate.getDate()+info.item.repayPeriod}`)
+            dueDate.setDate(dueDate.getDate()+info.item.repayPeriod);
             return (
                 <View style={styles.itemFooter}>
                     <Button
@@ -149,6 +168,9 @@ export default class MyLoansScreen extends Component<Props> {
                     <Text style={styles.activityButton} category='s1'>
                         {`Issued: ${info.item.loanIssued.toLocaleDateString('en-US')}`}
                     </Text>
+                    <Text style={styles.activityButton} category='s1'>
+                        {`Due by: ${dueDate.toLocaleDateString('en-US')}`}
+                    </Text>
                 </View>
             );
         }
@@ -168,14 +190,44 @@ export default class MyLoansScreen extends Component<Props> {
     render() {
         return (
             <SafeAreaView style={{flex: 1}}>
-                <TopNavigation title='My Loans' alignment='center' leftControl={<TopNavigationAction icon={MenuIcon}
-                                                                                                        onPress={this.props.navigation.toggleDrawer}/>}/>
-                <Divider/>
-                <List
-                    style={styles.list}
-                    data={offers}
-                    renderItem={this.renderItem.bind(this)}
-                />
+                <TopNavigation title='My Loans'
+                               alignment='center'
+                               leftControl={<TopNavigationAction icon={MenuIcon} onPress={this.props.navigation.toggleDrawer}/>}/>
+                <TabView
+                    selectedIndex={this.state.selectedIndex}
+                    onSelect={index => {
+                        this.setState({selectedIndex: index})
+                    }}>
+                    <Tab title='All'>
+
+                        <Layout style={styles.tabContainer}>
+                            <List
+                                style={styles.list}
+                                data={offers}
+                                renderItem={this.renderItem.bind(this)}
+                            />
+                        </Layout>
+
+                    </Tab>
+                    <Tab title='Pending'>
+                        <Layout style={styles.tabContainer}>
+                            <List
+                                style={styles.list}
+                                data={offers.filter(value => !value.loanSettled)}
+                                renderItem={this.renderItem.bind(this)}
+                            />
+                        </Layout>
+                    </Tab>
+                    <Tab title='Settled'>
+                        <Layout style={styles.tabContainer}>
+                            <List
+                                style={styles.list}
+                                data={offers.filter(value => value.loanSettled)}
+                                renderItem={this.renderItem.bind(this)}
+                            />
+                        </Layout>
+                    </Tab>
+                </TabView>
             </SafeAreaView>
 
         );

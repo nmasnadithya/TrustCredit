@@ -105,11 +105,12 @@ export default class LoginScreen extends Component<Props, State> {
 
     onSignInButtonPress() {
         auth()
-            .signInWithEmailAndPassword(this.state.email!, this.state.password!)
+            .signInWithEmailAndPassword(this.state.email!.trim(), this.state.password!)
             .then(userCredential => {
-                console.log(`Logged in with user ${userCredential.user.email} (${userCredential.user.uid})`)
-                Profile.fetchProfile(userCredential.user.uid);
-                this.props.navigation.navigate(AppRoute.APP);
+                console.log(`Logged in with user ${userCredential.user.email?.trim()} (${userCredential.user.uid})`)
+                Profile.fetchProfile(userCredential.user.uid).then(r => {
+                    this.props.navigation.navigate(AppRoute.APP);
+                });
             }).catch(reason => {
                 console.log(`Login failed due to ${reason}`)
         })

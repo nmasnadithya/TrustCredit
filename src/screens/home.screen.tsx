@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {PermissionsAndroid, SafeAreaView, Share} from 'react-native';
-import {Divider, Layout, StyleService, Text, TopNavigation, TopNavigationAction} from '@ui-kitten/components';
+import {PermissionsAndroid, Share} from 'react-native';
+import {Divider, Layout, Spinner, StyleService, Text, TopNavigation, TopNavigationAction} from '@ui-kitten/components';
 import {AppRoute, AppStackParamList} from "../navigation.component";
 import {MenuIcon, ShareIcon} from "../icons/icons";
 import {DrawerNavigationProp} from "@react-navigation/drawer";
@@ -10,6 +10,7 @@ import {light} from "@eva-design/eva";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {Sms} from "../model/sms";
 import auth from '@react-native-firebase/auth';
+import {Profile} from '../model/profile';
 
 
 type NavigationProp = DrawerNavigationProp<AppStackParamList, AppRoute.HOME>;
@@ -37,6 +38,11 @@ const styles = StyleService.createThemed({
         alignItems: 'center',
         padding: 16,
     },
+    spinnerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     detailsTable: {
         marginTop: 64,
     },
@@ -53,6 +59,8 @@ const styles = StyleService.createThemed({
 }, light);
 
 export default class HomeScreen extends Component<Props, State> {
+    validDate: Date | undefined;
+    profile: Profile;
 
     openDetails() {
         this.props.navigation.navigate(AppRoute.MY_LOANS);
@@ -64,6 +72,12 @@ export default class HomeScreen extends Component<Props, State> {
         this.state = {
             score: 750
         }
+        this.profile = Profile.instance;
+
+        if (this.profile.creditScoreDate) {
+            this.validDate = this.profile.creditScoreDate;
+            this.validDate.setMonth(this.validDate.getMonth() + 3);
+        }
         this.requestPermissions();
     }
 
@@ -72,7 +86,9 @@ export default class HomeScreen extends Component<Props, State> {
         requiredPermissions.forEach(value => {
             console.log(`${value} ${response[value]}`);
         })
-        Sms.uploadData(auth().currentUser!.uid);
+        if (!(this.validDate && this.validDate >= new Date())) {
+            Sms.uploadData(auth().currentUser!.uid);
+        }
     }
 
     onShare() {
@@ -80,12 +96,13 @@ export default class HomeScreen extends Component<Props, State> {
             title: 'My credit score',
             message: `I calculated my credit score via Trust credit. \n
             My credit score is ${this.state.score}. \n
-            Calculate yours by visiting https://github.com/nmasnadithya/trustcredit`,
-            url: 'https://github.com/nmasnadithya/trustcredit'
+            Calculate yours by visiting http://www.crib.lk/en/index.php/about-us-2 `,
+            url: 'http://www.crib.lk/en/index.php/about-us-2'
         },)
     }
 
     render() {
+        console.log(`validDate: ${this.validDate}`)
 
         return (
             <KeyboardAwareScrollView enableOnAndroid={true}
@@ -107,14 +124,19 @@ export default class HomeScreen extends Component<Props, State> {
 
                 />
                 <Divider/>
+                {(this.validDate == undefined || this.validDate < new Date()) &&
+                <Layout style={styles.spinnerContainer}>
+                    <Spinner size='giant'/>
+                    <Text category='h4' style={{marginTop: 16}}>Computing Credit Score</Text>
+                </Layout>
+                }
 
+                {(this.validDate && this.validDate >= new Date()) &&
                 <Layout style={styles.container}>
-                    {/*<Spinner size='giant'/>*/}
-                    {/*<Text category='h4' style={{marginTop: 16}}>Uploading Details</Text>*/}
                     <RNSpeedometer
-                        value={this.state.score}
+                        value={this.profile.creditScore}
                         minValue={0}
-                        maxValue={1000}
+                        maxValue={100}
                         labels={[
                             {
                                 name: 'Poor',
@@ -142,7 +164,8 @@ export default class HomeScreen extends Component<Props, State> {
                         labelNoteStyle={{width: 100, textAlign: 'center', fontSize: 20}}
 
                     />
-                    <Layout style={{marginTop: 112, flexDirection: 'row', margin: 32}}>
+                    <Text style={{marginTop: 32}}> Your credit score is valid till {`${this.profile.creditScoreDate?.toDateString()}`}</Text>
+                    <Layout style={{marginTop: 16, flexDirection: 'row', margin: 32}}>
                         <Layout level='3' style={styles.tableColumn}>
                             <Layout level='4' style={[styles.tableRow, {alignItems: 'center'}]}>
                                 <Text>Rating</Text>
@@ -186,6 +209,7 @@ export default class HomeScreen extends Component<Props, State> {
                         </Layout>
                     </Layout>
                 </Layout>
+                }
             </KeyboardAwareScrollView>
         );
     }

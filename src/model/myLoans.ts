@@ -7,13 +7,15 @@ export class MyLoan extends LoanOffer {
                 loanOffer: LoanOffer,
                 readonly loanSettled?: Date,) {
         super(
+            loanOffer.id,
             loanOffer.bank,
             loanOffer.bankImage,
             loanOffer.amount,
             loanOffer.repayPeriod,
             loanOffer.interestRate,
             loanOffer.description,
-            loanOffer.creditScore
+            loanOffer.creditScore,
+            loanOffer.email,
         );
     }
 
@@ -40,7 +42,7 @@ export class MyLoan extends LoanOffer {
     static offer4(): MyLoan {
         return new MyLoan(
             new Date("2020-03-05"),
-            LoanOffer.offer1()
+            LoanOffer.offer2()
         );
     }
 }

@@ -12,12 +12,14 @@ import SignupScreen3 from "./screens/register/signup3.screen";
 import SignupScreen4 from "./screens/register/signup4.screen";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import {Drawer as UIKittenDrawer, DrawerHeaderFooter} from '@ui-kitten/components';
-import {BellIcon, FaqIcon, HomeIcon, LoansIcon, LogOutIcon, OffersIcon, PersonIcon} from "./icons/icons";
+import {BellIcon, FaqIcon, HistoryIcon, HomeIcon, LoansIcon, LogOutIcon, OffersIcon, PersonIcon} from "./icons/icons";
 import LoanOffersScreen from "./screens/loanoffers.screen";
 import ContactScreen from "./screens/contactus.screen";
 import ProfileScreen from "./screens/profile.screen";
 import LoanDetailsScreen, {RouteParams as OfferDetailsProps} from "./screens/loandetails.screen";
 import {Profile} from "./model/profile";
+import HistoryScreen from "./screens/history.screen";
+import FaqScreen from "./screens/faq.screen";
 
 export enum AppRoute {
     AUTH = 'Auth',
@@ -31,6 +33,7 @@ export enum AppRoute {
     CONTACT = 'Contact',
     PROFILE = 'Profile',
     FAQ = 'Faq',
+    HISTORY = 'History',
     GUIDE = 'Guide',
     SPLASH = 'Splash',
     SIGNUP = 'Signup',
@@ -52,6 +55,7 @@ export type AppStackParamList = AppNavigatorParams & {
     [AppRoute.HOME]: undefined;
     [AppRoute.MY_LOANS]: undefined;
     [AppRoute.LOAN_OFFERS]: undefined;
+    [AppRoute.HISTORY]: undefined;
     [AppRoute.CONTACT]: undefined;
     [AppRoute.FAQ]: undefined;
     [AppRoute.PROFILE]: undefined;
@@ -96,6 +100,7 @@ const drawerData = [
     {title: 'My Credit Score', icon: HomeIcon},
     {title: 'My Loans', icon: LoansIcon},
     {title: 'Loan Offers', icon: OffersIcon},
+    {title: 'Score History', icon: HistoryIcon},
     {title: 'Contact Us', icon: BellIcon},
     {title: 'FAQ', icon: FaqIcon},
 ];
@@ -140,8 +145,9 @@ const HomeNavigator = () => (
         <HomeStack.Screen name={AppRoute.HOME} component={HomeScreen}/>
         <HomeStack.Screen name={AppRoute.MY_LOANS} component={MyLoansScreen}/>
         <HomeStack.Screen name={AppRoute.LOAN_OFFERS} component={LoanOffersScreen}/>
+        <HomeStack.Screen name={AppRoute.HISTORY} component={HistoryScreen}/>
         <HomeStack.Screen name={AppRoute.CONTACT} component={ContactScreen}/>
-        <HomeStack.Screen name={AppRoute.FAQ} component={ContactScreen}/>
+        <HomeStack.Screen name={AppRoute.FAQ} component={FaqScreen}/>
         <HomeStack.Screen name={AppRoute.PROFILE} component={ProfileScreen}/>
         <HomeStack.Screen name={AppRoute.LOAN_DETAILS} component={LoanDetailsScreen}/>
     </HomeStack.Navigator>

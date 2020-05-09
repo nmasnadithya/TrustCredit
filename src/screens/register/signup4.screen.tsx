@@ -134,8 +134,9 @@ export default class SignupScreen4 extends Component<Props, State> {
                     .set(profile)
                     .then(a => {
                         console.log('Added User Account details');
-                        Profile.instance = profile;
-                        this.props.navigation.navigate(AppRoute.APP);
+                        Profile.fetchProfile(userCredential.user.uid).then(r => {
+                            this.props.navigation.navigate(AppRoute.APP);
+                        });
                     })
             })
             .catch(error => {

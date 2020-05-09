@@ -11,12 +11,12 @@ export class Profile {
                 public age?: number,
                 public nic?: string,
                 public address?: string,
-                public photo?: ImageSourcePropType,
+                public photo?: string,
                 public serviceProvider?: string,
                 public mobilePackageType?: string,
                 public mobileNo?: string,
                 public smartphoneModel?: string,
-                public smartphonePurchaseDate?: Date,
+                public smartphonePurchaseDate?: string,
                 public educationLevel?: string,
                 public employmentState?: string,
                 public employmentDuration?: string,
@@ -25,40 +25,41 @@ export class Profile {
                 public savingsAccount?: string,
                 public bank?: string,
                 public branch?: string,
-                readonly creditScore?: number) {
+                readonly creditScore?: number,
+                readonly creditScoreDate?: Date) {
     }
 
-    static fetchProfile(uid: string) {
+    static async fetchProfile(uid: string) {
         this.uid = uid;
-        firestore()
+        let value = await firestore()
             .collection('Users')
             .doc(this.uid)
-            .get()
-            .then(value => {
-                let p = value.data();
-                this.instance = new Profile(
-                    p?.fullName,
-                    p?.email,
-                    p?.dob,
-                    p?.age,
-                    p?.nic,
-                    p?.address,
-                    {uri: p?.photo},
-                    p?.serviceProvider,
-                    p?.mobilePackageType,
-                    p?.mobileNo,
-                    p?.smartphoneModel,
-                    p?.smartphonePurchaseDate,
-                    p?.educationLevel,
-                    p?.employmentState,
-                    p?.employmentDuration,
-                    p?.monthlyIncome,
-                    p?.residentialStatus,
-                    p?.savingsAccount,
-                    p?.bank,
-                    p?.branch,
-                    p?.creditScore,
-                    )
-            })
+            .get();
+        console.log("fetched profile")
+        let p = value.data();
+        this.instance = new Profile(
+            p?.fullName,
+            p?.email,
+            p?.dob.toDate(),
+            p?.age,
+            p?.nic,
+            p?.address,
+            "../assets/image-person.png",
+            p?.serviceProvider,
+            p?.mobilePackageType,
+            p?.mobileNo,
+            p?.smartphoneModel,
+            p?.smartphonePurchaseDate,
+            p?.educationLevel,
+            p?.employmentState,
+            p?.employmentDuration,
+            p?.monthlyIncome,
+            p?.residentialStatus,
+            p?.savingsAccount,
+            p?.bank,
+            p?.branch,
+            p?.creditScore,
+            p?.creditScoreDate?.toDate(),
+        )
     }
 }
