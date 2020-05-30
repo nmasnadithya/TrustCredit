@@ -21,12 +21,15 @@ import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
 import {Profile} from "../../model/profile";
 import {RouteProp} from "@react-navigation/native";
+import ImagePicker from 'react-native-image-picker';
+import {v4 as uuidv4} from 'uuid';
+import storage from '@react-native-firebase/storage';
 
-type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP2>;
+type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP1_5>;
 
 type Props = {
     navigation: NavigationProp
-    route: RouteProp<AuthStackParamList, AppRoute.SIGNUP2>;
+    route: RouteProp<AuthStackParamList, AppRoute.SIGNUP1_5>;
 };
 
 type State = {
@@ -114,7 +117,7 @@ const mobilePackageSelect = [
 ];
 
 
-export default class SignupScreen2 extends Component<Props, State> {
+export default class SignupScreen1_5 extends Component<Props, State> {
 
     constructor(props: Readonly<Props>) {
         super(props);
@@ -124,15 +127,65 @@ export default class SignupScreen2 extends Component<Props, State> {
     }
 
     onSignUpButtonPress() {
-        let profile = this.props.route.params.profile;
-        profile.address = this.state.address;
-        profile.serviceProvider = (this.state.serviceProvider as SelectOptionType).text;
-        profile.mobilePackageType = (this.state.mobilePackage as SelectOptionType).text;
-        profile.mobileNo = this.state.mobileNumber;
-        this.props.navigation.navigate(AppRoute.SIGNUP3, {
-            profile: profile,
-            password: this.props.route.params.password
+        let fileName = uuidv4();
+        ImagePicker.showImagePicker({
+            title: 'Upload NIC (Front)'
+        }, (response) => {
+
+            if (response.didCancel) {
+                console.log('User cancelled NIC image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            } else {
+
+                const ext = response.fileName?.split('.');
+                let path = `/NIC/${fileName}-front.${ext![ext!.length-1]}`;
+                console.log(path);
+                const reference = storage().ref(path);
+                console.log(response.path);
+                reference.putFile(response.path!).then(async a => {
+                    console.log(a);
+                    let url = await reference.getDownloadURL();
+                    console.log(url);
+                }).catch(reason => {
+                    console.log(reason);
+                });
+
+                ImagePicker.showImagePicker({
+                    title: 'Upload NIC (Back)'
+                }, (response) => {
+
+                    if (response.didCancel) {
+                        console.log('User cancelled NIC image picker');
+                    } else if (response.error) {
+                        console.log('ImagePicker Error: ', response.error);
+                    } else if (response.customButton) {
+                        console.log('User tapped custom button: ', response.customButton);
+                    } else {
+                        const ext = response.fileName?.split('.');
+                        let path = `/NIC/${fileName}-back.${ext![ext!.length-1]}`;
+                        console.log(path);
+                        const reference = storage().ref(path);
+                        console.log(response.path);
+                        reference.putFile(response.path!).then(async a => {
+                            console.log(a);
+                            let url = await reference.getDownloadURL();
+                            console.log(url);
+                        }).catch(reason => {
+                            console.log(reason);
+                        });
+                        let profile = this.props.route.params.profile;
+                        this.props.navigation.navigate(AppRoute.SIGNUP2, {
+                            profile: profile,
+                            password: this.props.route.params.password
+                        });
+                    }
+                });
+            }
         });
+
     }
 
     render() {
@@ -143,52 +196,15 @@ export default class SignupScreen2 extends Component<Props, State> {
                 <Layout
                     style={styles.formContainer}
                     level='1'>
-                    <Text category='h4' style={styles.stepCounterText}>Basic Details</Text>
-                    <Input
-                        autoCapitalize='none'
-                        style={styles.emailInput}
-                        placeholder='Home Address'
-                        icon={AddressIcon}
-                        value={this.state.address}
-                        onChangeText={text => {
-                            this.setState({address: text})
-                        }}
-                    />
-                    <Select
-                        style={styles.emailInput}
-                        placeholder='Mobile Service Provider'
-                        data={serviceProviderSelect}
-                        selectedOption={this.state.serviceProvider}
-                        onSelect={option => {
-                            this.setState({serviceProvider: option})
-                        }}
-                    />
-                    <Select
-                        style={styles.emailInput}
-                        placeholder='Mobile Package Type'
-                        data={mobilePackageSelect}
-                        selectedOption={this.state.mobilePackage}
-                        onSelect={option => {
-                            this.setState({mobilePackage: option})
-                        }}
-                    />
-                    <Input
-                        style={styles.emailInput}
-                        autoCapitalize='none'
-                        placeholder='Mobile number'
-                        icon={PhoneIcon}
-                        value={this.state.mobileNumber}
-                        onChangeText={text => {
-                            this.setState({mobileNumber: text.substr(0,10)})
-                        }}
-                    />
+                    <Text category='h4' style={styles.stepCounterText}>Upload Your NIC</Text>
+
                 </Layout>
 
                 <Button
                     style={styles.signUpButton}
                     size='giant'
                     onPress={this.onSignUpButtonPress.bind(this)}>
-                    NEXT >
+                    UPLOAD
                 </Button>
             </KeyboardAwareScrollView>
         );

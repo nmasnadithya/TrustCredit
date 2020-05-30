@@ -1,17 +1,19 @@
 import {StackNavigationProp} from "@react-navigation/stack";
 import {AppRoute, AuthStackParamList} from "../../navigation.component";
 import React, {Component} from "react";
-import {Button, CheckBox, Datepicker, Input, Layout, StyleService} from "@ui-kitten/components";
-import {ImageStyle, ImageURISource, PermissionsAndroid, View} from "react-native";
+import {Button, CheckBox, Input, Layout, StyleService} from "@ui-kitten/components";
+import {ImageStyle, ImageURISource, View} from "react-native";
 import {CalendarIcon, EmailIcon, EyeIcon, EyeOffIcon, NICIcon, PersonIcon, PlusIcon} from "../../icons/icons";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {ProfileAvatar} from "../../ui/ProfileAvatar";
 import {light} from "@eva-design/eva";
-import {AccessToken, LoginManager} from "react-native-fbsdk";
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from "@react-native-community/google-signin";
 import {Profile} from "../../model/profile";
 import ImagePicker from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
 
 type NavigationProp = StackNavigationProp<AuthStackParamList, AppRoute.SIGNUP>;
 
@@ -115,49 +117,13 @@ export default class SignupScreen extends Component<Props, State> {
     }
 
     onSignUpButtonPress() {
-        //TODO: validation
-        ImagePicker.showImagePicker({
-            title: 'Upload NIC'
-        }, (response) => {
-            console.log('Response = ', response);
-
-            if (response.didCancel) {
-                console.log('User cancelled NIC image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else if (response.customButton) {
-                console.log('User tapped custom button: ', response.customButton);
-            } else {
-                //TODO: upload
-                this.props.navigation.navigate(AppRoute.SIGNUP2, {
-                    profile: new Profile(this.state.userName, this.state.email, this.state.dob, (new Date()).getFullYear() - this.state.dob!.getFullYear(), this.state.nic),
-                    password: this.state.password!
-                });
-            }
+        this.props.navigation.navigate(AppRoute.SIGNUP1_5, {
+            profile: new Profile(this.state.userName, this.state.email, this.state.dob, (new Date()).getFullYear() - this.state.dob!.getFullYear(), this.state.nic, this.state.avatarSource.uri),
+            password: this.state.password!
         });
 
     }
 
-    async onFacebookSignUp() {
-        const result = await LoginManager.logInWithPermissions(['public_profile', 'email', "user_birthday"]);
-
-        console.log(result)
-        if (result.isCancelled) {
-            throw 'User cancelled the login process';
-        }
-        // Once signed in, get the users AccesToken
-        const data = await AccessToken.getCurrentAccessToken();
-
-        if (!data) {
-            throw 'Something went wrong obtaining access token';
-        }
-
-        // Create a Firebase credential with the AccessToken
-        const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-
-        // Sign-in the user with the credential
-        await auth().signInWithCredential(facebookCredential);
-    }
 
     // Create a Google credential with the token
     async onGoogleSignUp() {
@@ -186,8 +152,6 @@ export default class SignupScreen extends Component<Props, State> {
         ImagePicker.showImagePicker({
             title: 'Select Profile Picture'
         }, (response) => {
-            console.log('Response = ', response);
-
             if (response.didCancel) {
                 console.log('User cancelled image picker');
             } else if (response.error) {
@@ -195,14 +159,27 @@ export default class SignupScreen extends Component<Props, State> {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
-                const source = {uri: response.uri};
+                const ext = response.fileName?.split('.');
+                let path = `/profileImage/${uuidv4()}.${ext![ext!.length-1]}`;
+                console.log(path);
+                const reference = storage().ref(path);
+                console.log(response.path);
+                reference.putFile(response.path!).then(async a => {
+                    console.log(a);
+                    let url = await reference.getDownloadURL();
+                    console.log(url);
+                    const source = {uri: url};
 
-                // You can also display the image using data:
-                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+                    // You can also display the image using data:
+                    // const source = { uri: 'data:image/jpeg;base64,' + response.data };
 
-                this.setState({
-                    avatarSource: source,
+                    this.setState({
+                        avatarSource: source,
+                    });
+                }).catch(reason => {
+                    console.log(reason);
                 });
+
             }
         });
     }
@@ -253,18 +230,16 @@ export default class SignupScreen extends Component<Props, State> {
                         icon={NICIcon}
                         value={this.state.nic}
                         onChangeText={text => {
-                            this.setState({nic: text})
+                            this.setState({nic: text.substr(0, 10)})
                         }}
                     />
-                    <Datepicker
-                        placeholder='Birthday'
+                    <Input
+                        placeholder='Birthday (yyyy/mm/dd)'
                         style={styles.emailInput}
-                        date={this.state.dob}
-                        onSelect={date => {
-                            this.setState({dob: date})
+                        onChangeText={text => {
+                            this.setState({dob: new Date(text)})
                         }}
                         icon={CalendarIcon}
-                        min={new Date("1900/01/01")}
 
                     />
                     <Input

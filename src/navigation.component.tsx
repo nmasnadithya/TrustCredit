@@ -20,6 +20,7 @@ import LoanDetailsScreen, {RouteParams as OfferDetailsProps} from "./screens/loa
 import {Profile} from "./model/profile";
 import HistoryScreen from "./screens/history.screen";
 import FaqScreen from "./screens/faq.screen";
+import SignupScreen1_5 from './screens/register/signup1.5.screen';
 
 export enum AppRoute {
     AUTH = 'Auth',
@@ -37,6 +38,7 @@ export enum AppRoute {
     GUIDE = 'Guide',
     SPLASH = 'Splash',
     SIGNUP = 'Signup',
+    SIGNUP1_5 = 'Signup1.5',
     SIGNUP2 = 'Signup2',
     SIGNUP3 = 'Signup3',
     SIGNUP4 = 'Signup4',
@@ -67,6 +69,7 @@ export type AuthStackParamList = AppNavigatorParams & {
     [AppRoute.LOGIN]: undefined;
     [AppRoute.WELCOME]: undefined;
     [AppRoute.SIGNUP]: undefined;
+    [AppRoute.SIGNUP1_5]: { profile: Profile, password: string };
     [AppRoute.SIGNUP2]: { profile: Profile, password: string };
     [AppRoute.SIGNUP3]: { profile: Profile, password: string };
     [AppRoute.SIGNUP4]: { profile: Profile, password: string };
@@ -89,6 +92,7 @@ const AuthNavigator = (): React.ReactElement => (
         <AuthStack.Screen name={AppRoute.WELCOME} component={WelcomeScreen}/>
         <AuthStack.Screen name={AppRoute.LOGIN} component={LoginScreen}/>
         <AuthStack.Screen name={AppRoute.SIGNUP} component={SignupScreen}/>
+        <AuthStack.Screen name={AppRoute.SIGNUP1_5} component={SignupScreen1_5}/>
         <AuthStack.Screen name={AppRoute.SIGNUP2} component={SignupScreen2}/>
         <AuthStack.Screen name={AppRoute.SIGNUP3} component={SignupScreen3}/>
         <AuthStack.Screen name={AppRoute.SIGNUP4} component={SignupScreen4}/>
@@ -124,8 +128,8 @@ class DrawerContent extends React.Component<{ navigation: any, state: any }> {
                 data={drawerData}
                 selectedIndex={state.index}
                 header={() => <DrawerHeaderFooter
-                    title='JONE DOE'
-                    description='077 8060 988'
+                    title={Profile.instance.fullName}
+                    description={Profile.instance.mobileNo}
                     icon={PersonIcon}
                     onPress={onProfile}
                 />}

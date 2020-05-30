@@ -189,7 +189,7 @@ export default class SignupScreen3 extends Component<Props, State> {
                     />
                     <Select
                         style={styles.emailInput}
-                        placeholder='Smartphone Purchase Date'
+                        placeholder='Smartphone Purchase Year'
                         data={smartPhonePurchaseSelect}
                         selectedOption={this.state.phonePurchase}
                         onSelect={option => {
@@ -220,6 +220,9 @@ export default class SignupScreen3 extends Component<Props, State> {
                         disabled={this.state.employment == employmentSelect[0]}
                         value = {this.state.employmentDuration}
                         onChangeText={text => {
+                            if(parseFloat(text) > 15){
+                                text="15";
+                            }
                             this.setState({
                                 employmentDuration: text,
                                 employmentDurationValidation: this.state.employment != undefined &&
@@ -239,6 +242,9 @@ export default class SignupScreen3 extends Component<Props, State> {
                         disabled={this.state.employment == employmentSelect[0]}
                         value = {this.state.monthlyIncome}
                         onChangeText={text => {
+                            if(parseFloat(text) > 100000){
+                                text="100000";
+                            }
                             this.setState({
                                 monthlyIncome: text,
                                 monthlyIncomeValidation: this.state.employment != undefined &&

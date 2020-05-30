@@ -142,8 +142,8 @@ export default class LoanDetailsScreen extends Component<ScreenProps, State> {
     onApply() {
 
         let offer = this.props.route.params.offer;
-        let profile = Profile.instance;
-        let url = `https://us-central1-trust-credit.cloudfunctions.net/sendMail?to=${offer.email}&nic=${profile.nic}&id=${offer.id}&amount=${offer.amount}&interest=${offer.interestRate}&period=${offer.repayPeriod}&bank=${profile.bank}&branch=${profile.branch}&accountNo=${profile.savingsAccount}&name=${profile.fullName}`;
+        console.log(offer)
+        let url = `https://us-central1-trust-credit.cloudfunctions.net/sendMail?user=${Profile.uid}&offer=${offer.id}`;
         this.setState({showModal: true})
         fetch(url)
             .then((response) => {
@@ -229,7 +229,7 @@ export default class LoanDetailsScreen extends Component<ScreenProps, State> {
                                 <Text
                                     category='s1'
                                     status='control'>
-                                    {`${offer.amount * (offer.interestRate + 1)} LKR`}
+                                    {`${(offer.amount * (offer.interestRate + 1)).toFixed(2)} LKR`}
                                 </Text>
                             </View>
                             <Divider style={styles.dividerStyle}/>

@@ -32,7 +32,7 @@ export class LoanOffer {
         }
         data.forEach(offer => {
             let d = offer.data();
-            output.push(new LoanOffer(d.key,
+            output.push(new LoanOffer(offer.id,
                 d.bank,
                 {uri: d.bankImage},
                 d.amount,
@@ -45,55 +45,55 @@ export class LoanOffer {
         return output;
     }
 
-    static offer1(): LoanOffer {
-        return new LoanOffer("dsfsdfsdfsdf",
-            "Patrickgold Microfinance",
-            require("../assets/bank-1.png"),
-            10000,
-            45,
-            0.1,
-            "You earn +25 points if settled on time",
-            123,
-            "iframismath@gmail.com"
-        );
-    }
-
-    static offer2(): LoanOffer {
-        return new LoanOffer("dsfsdfsdfsdf",
-            "Addosser Microfinance",
-            require("../assets/bank-2.png"),
-            10000,
-            15,
-            0.1,
-            "You earn +25 points if settled on time",
-            45,
-            "iframismath@gmail.com"
-        );
-    }
-
-    static offer3(): LoanOffer {
-        return new LoanOffer("dsfsdfsdfsdf",
-            "IBILE Microfinance",
-            require("../assets/bank-3.png"),
-            15000,
-            16,
-            0.12,
-            "You earn +25 points if settled on time",
-            89,
-            "iframismath@gmail.com"
-        );
-    }
-
-    static offer4(): LoanOffer {
-        return new LoanOffer("dsfsdfsdfsdf",
-            "BaOBaB Microfinance",
-            require("../assets/bank-4.png"),
-            17000,
-            21,
-            0.115,
-            "You earn +25 points if settled on time",
-            10,
-            "iframismath@gmail.com"
-        );
-    }
+    // static offer1(): LoanOffer {
+    //     return new LoanOffer("dsfsdfsdfsdf",
+    //         "Patrickgold Microfinance",
+    //         require("../assets/bank-1.png"),
+    //         10000,
+    //         45,
+    //         0.1,
+    //         "You earn +25 points if settled on time",
+    //         123,
+    //         "iframismath@gmail.com"
+    //     );
+    // }
+    //
+    // static offer2(): LoanOffer {
+    //     return new LoanOffer("dsfsdfsdfsdf",
+    //         "Addosser Microfinance",
+    //         require("../assets/bank-2.png"),
+    //         10000,
+    //         15,
+    //         0.1,
+    //         "You earn +25 points if settled on time",
+    //         45,
+    //         "iframismath@gmail.com"
+    //     );
+    // }
+    //
+    // static offer3(): LoanOffer {
+    //     return new LoanOffer("dsfsdfsdfsdf",
+    //         "IBILE Microfinance",
+    //         require("../assets/bank-3.png"),
+    //         15000,
+    //         16,
+    //         0.12,
+    //         "You earn +25 points if settled on time",
+    //         89,
+    //         "iframismath@gmail.com"
+    //     );
+    // }
+    //
+    // static offer4(): LoanOffer {
+    //     return new LoanOffer("dsfsdfsdfsdf",
+    //         "BaOBaB Microfinance",
+    //         require("../assets/bank-4.png"),
+    //         17000,
+    //         21,
+    //         0.115,
+    //         "You earn +25 points if settled on time",
+    //         10,
+    //         "iframismath@gmail.com"
+    //     );
+    // }
 }

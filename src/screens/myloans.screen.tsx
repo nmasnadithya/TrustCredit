@@ -29,6 +29,7 @@ type Props = {
 };
 
 type State = {
+    loans: MyLoan[],
     selectedIndex: number,
 };
 
@@ -62,14 +63,6 @@ const styles = StyleService.createThemed({
     },
 }, light);
 
-const offers: MyLoan[] = [
-    MyLoan.offer1(),
-    MyLoan.offer2(),
-    MyLoan.offer3(),
-    MyLoan.offer4(),
-    MyLoan.offer2(),
-    MyLoan.offer3(),
-];
 
 export default class MyLoansScreen extends Component<Props, State> {
 
@@ -78,7 +71,13 @@ export default class MyLoansScreen extends Component<Props, State> {
         super(props);
         this.state = {
             selectedIndex: 0,
+            loans: [],
         }
+        MyLoan.getLoans().then(value => {
+            this.setState({
+                loans: value
+            })
+        })
     }
 
     renderHeader(info: ListRenderItemInfo<MyLoan>): React.ReactElement {
@@ -134,7 +133,7 @@ export default class MyLoansScreen extends Component<Props, State> {
                         {`${info.item.interestRate * 100}%`}
                     </Button>
                     <Text style={styles.activityButton} category='s1'>
-                        {`Issued: ${info.item.loanIssued.toLocaleDateString('en-US')}`}
+                        {`Issued: ${info.item.loanIssued?.toLocaleDateString('en-US')}`}
                     </Text>
                     {/*TODO: fix alignments*/}
                     <Text style={styles.activityButton} category='s1'>
@@ -142,7 +141,7 @@ export default class MyLoansScreen extends Component<Props, State> {
                     </Text>
                 </View>
             );
-        } else {
+        } else if(info.item.loanIssued) {
             let dueDate = new Date(info.item.loanIssued);
             console.log(`date: ${dueDate.getDate()}`)
             console.log(`period: ${info.item.repayPeriod}`)
@@ -170,6 +169,29 @@ export default class MyLoansScreen extends Component<Props, State> {
                     </Text>
                     <Text style={styles.activityButton} category='s1'>
                         {`Due by: ${dueDate.toLocaleDateString('en-US')}`}
+                    </Text>
+                </View>
+            );
+        } else {
+            return (
+                <View style={styles.itemFooter}>
+                    <Button
+                        style={styles.activityButton}
+                        appearance='ghost'
+                        size='tiny'
+                        icon={MoneyIcon}>
+                        {`LKR ${info.item.amount}`}
+                    </Button>
+                    <Button
+                        style={styles.activityButton}
+                        appearance='ghost'
+                        size='tiny'
+                        status='danger'
+                        icon={InterestIcon}>
+                        {`${info.item.interestRate * 100}%`}
+                    </Button>
+                    <Text style={styles.activityButton} category='s1'>
+                        {`Requested: ${info.item.loanRequested.toLocaleDateString('en-US')}`}
                     </Text>
                 </View>
             );
@@ -203,17 +225,26 @@ export default class MyLoansScreen extends Component<Props, State> {
                         <Layout style={styles.tabContainer}>
                             <List
                                 style={styles.list}
-                                data={offers}
+                                data={this.state.loans}
                                 renderItem={this.renderItem.bind(this)}
                             />
                         </Layout>
 
                     </Tab>
-                    <Tab title='Pending'>
+                    <Tab title='Requested'>
                         <Layout style={styles.tabContainer}>
                             <List
                                 style={styles.list}
-                                data={offers.filter(value => !value.loanSettled)}
+                                data={this.state.loans.filter(value => !value.loanIssued)}
+                                renderItem={this.renderItem.bind(this)}
+                            />
+                        </Layout>
+                    </Tab>
+                    <Tab title='Active'>
+                        <Layout style={styles.tabContainer}>
+                            <List
+                                style={styles.list}
+                                data={this.state.loans.filter(value => value.loanIssued && !value.loanSettled)}
                                 renderItem={this.renderItem.bind(this)}
                             />
                         </Layout>
@@ -222,7 +253,7 @@ export default class MyLoansScreen extends Component<Props, State> {
                         <Layout style={styles.tabContainer}>
                             <List
                                 style={styles.list}
-                                data={offers.filter(value => value.loanSettled)}
+                                data={this.state.loans.filter(value => value.loanSettled)}
                                 renderItem={this.renderItem.bind(this)}
                             />
                         </Layout>

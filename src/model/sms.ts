@@ -1,22 +1,28 @@
 // @ts-ignore
 import SmsAndroid from 'react-native-get-sms-android';
-// @ts-ignore
-import convertArrayToCSV from 'convert-array-to-csv';
 import firestore from "@react-native-firebase/firestore";
 import storage from '@react-native-firebase/storage';
+import {Parser} from 'json2csv';
 
 export class Sms {
 
     constructor(readonly _address: string,
-                readonly _readable_date: string,
                 readonly _body: string,
+                readonly _readable_date: string,
     ) {
     }
 
+
     static uploadData(userId: string) {
         console.log(`Fetching SMSes for user ${userId}`)
+        let minDate = new Date();
+        const fields = ['_address', '_body', '_readable_date'];
+        const json2csvParser = new Parser({ fields });
+        minDate.setMonth(minDate.getMonth() - 12);
         SmsAndroid.list(
-            JSON.stringify({}),
+            JSON.stringify({
+                minDate: minDate.getTime()
+            }),
             (fail: any) => {
                 console.log('Failed with this error: ' + fail);
             },
@@ -27,18 +33,18 @@ export class Sms {
                     let d = new Date(value.date);
                     return new Sms(
                         value.address,
-                        `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`,
-                        value.body
+                        value.body,
+                        `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()%100} 00:00`,
                     )
                 })
 
                 console.log(`Parsed ${parsedArray.length} SMSes`);
                 console.log(parsedArray[0]);
 
-                const csv = convertArrayToCSV(parsedArray);
+                const csv = json2csvParser.parse(parsedArray);
                 console.log("Prepared CSV");
                 let timestamp = new Date();
-                const reference = storage().ref(`/sms/${userId}/${timestamp.toTimeString()}.csv`);
+                const reference = storage().ref(`/sms/${userId}/${timestamp.toISOString()}.csv`);
                 reference.putString(unescape(encodeURIComponent(csv))).then(a => {
                     console.log("uploaded CSV");
 

@@ -13,11 +13,11 @@ type Props = {
 
 const styles = StyleService.createThemed({
     logo: {
-        width: 64,
-        height: 64
+        width: 162,
+        height: 162
     },
     container: {
-        flex: 1
+        flex: 1,
     },
     layoutContainer: {
         padding: 16,
@@ -64,10 +64,10 @@ export default class WelcomeScreen extends Component<Props> {
                 <Layout style={styles.layoutContainer}>
                     <Image
                         style={styles.logo as ImageStyle}
-                        source={{uri: 'https://reactnative.dev/img/tiny_logo.png'}}
+                        source={require('../../assets/logo.png')}
                     />
-                    <Text category='h1'>Trust Credit.</Text>
-                    <Text category='h2'>Securely.</Text>
+                    <Text category='h1' style={{fontWeight: 'bold'}}>TrustCredit.</Text>
+                    <Text category='h2' style={{fontStyle:'italic'}}>A credit-score for the Unbanked</Text>
                     <Layout style={styles.buttonContainer}>
                         <Button style={styles.button} onPress={this.openSignUp.bind(this)} size='giant'>Sign
                             Up</Button>

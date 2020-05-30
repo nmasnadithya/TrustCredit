@@ -60,7 +60,7 @@ export default class ProfileScreen extends Component<Props, State> {
     constructor(props: Readonly<Props>) {
         super(props);
         this.state = {
-            avatarSource: require('../assets/image-person2.png')
+            avatarSource: {uri: Profile.instance.photo}
         }
     }
 
@@ -72,7 +72,6 @@ export default class ProfileScreen extends Component<Props, State> {
         ImagePicker.showImagePicker({
             title: 'Select Profile Picture'
         }, (response) => {
-            console.log('Response = ', response);
 
             if (response.didCancel) {
                 console.log('User cancelled image picker');

@@ -61,7 +61,6 @@ const styles = StyleService.createThemed({
 }, light);
 
 export default class LoanOffersScreen extends Component<Props, State> {
-    offers: LoanOffer[] = []
 
     constructor(props: Readonly<Props>) {
         super(props);
