@@ -9,6 +9,9 @@ import {ProfileSetting} from "../ui/ProfileSetting";
 import {Profile} from "../model/profile";
 import {CameraIcon, PersonIcon} from "../icons/icons";
 import ImagePicker from "react-native-image-picker";
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
+import storage from '@react-native-firebase/storage';
 
 const BackIcon = (style: ImageStyle) => (
     <Icon {...style} name='arrow-back'/>
@@ -80,13 +83,26 @@ export default class ProfileScreen extends Component<Props, State> {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
-                const source = {uri: response.uri};
+                const ext = response.fileName?.split('.');
+                let path = `/profileImage/${uuidv4()}.${ext![ext!.length-1]}`;
+                console.log(path);
+                const reference = storage().ref(path);
+                console.log(response.path);
+                reference.putFile(response.path!).then(async a => {
+                    console.log(a);
+                    let url = await reference.getDownloadURL();
+                    console.log(url);
+                    Profile.updateImage(url);
+                    const source = {uri: url};
 
-                // You can also display the image using data:
-                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+                    // You can also display the image using data:
+                    // const source = { uri: 'data:image/jpeg;base64,' + response.data };
 
-                this.setState({
-                    avatarSource: source,
+                    this.setState({
+                        avatarSource: source,
+                    });
+                }).catch(reason => {
+                    console.log(reason);
                 });
             }
         });

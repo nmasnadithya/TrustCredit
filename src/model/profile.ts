@@ -29,6 +29,15 @@ export class Profile {
                 readonly creditScoreDate?: Date) {
     }
 
+    static async updateImage(path: string) {
+        this.instance.photo = path;
+        return firestore()
+            .collection('Users')
+            .doc(this.uid).update({
+                photo: path,
+            });
+    }
+
     static async fetchProfile(uid: string) {
         this.uid = uid;
         let value = await firestore()
