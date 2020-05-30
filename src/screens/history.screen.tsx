@@ -1,9 +1,20 @@
 import React, {Component} from 'react';
 import {Dimensions, ImageStyle, SafeAreaView} from 'react-native';
-import {Divider, Icon, Layout, Popover, Text, TopNavigation, TopNavigationAction} from '@ui-kitten/components';
+import {
+    Card,
+    CardHeader,
+    Divider,
+    Icon,
+    Layout,
+    Popover, StyleService,
+    Text,
+    TopNavigation,
+    TopNavigationAction
+} from '@ui-kitten/components';
 import {AppRoute, AppStackParamList} from "../navigation.component";
 import {DrawerNavigationProp} from "@react-navigation/drawer";
 import {LineChart} from "react-native-chart-kit";
+import {light} from '@eva-design/eva';
 
 const BackIcon = (style: ImageStyle) => (
     <Icon {...style} name='arrow-back'/>
@@ -58,6 +69,13 @@ export default class HistoryScreen extends Component<Props, State> {
                 />
                 <Divider/>
                 <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Card style={styles.card} header={() => <CardHeader title={'Tips for a \'healthy\' credit score'}/>} status={'info'}>
+                        <Text>
+                            {'• Pay your monthly utility bills through your mobile\n\n' +
+                            '• Refrain from delaying your bill payments\n\n' +
+                            '• Settle your loan amounts before the due date \n'}
+                        </Text>
+                    </Card>
                     <Popover
                         visible={this.state.showValue}
                         placement='top'
@@ -125,3 +143,37 @@ export default class HistoryScreen extends Component<Props, State> {
         );
     }
 }
+const styles = StyleService.createThemed({
+    list: {
+        flex: 1,
+        padding: 4
+    },
+    item: {
+        borderRadius: 0,
+        marginVertical: 8,
+    },
+    itemHeader: {
+        height: 160,
+    },
+    itemFooter: {
+        flexDirection: 'row',
+        marginTop: 16,
+        marginHorizontal: -4,
+    },
+    activityButton: {
+        marginHorizontal: 4,
+        paddingHorizontal: 0,
+    },
+    backdrop: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 256,
+        padding: 32,
+    },card: {
+        marginVertical: 8,
+        marginBottom: 86,
+    },
+}, light);

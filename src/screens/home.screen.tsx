@@ -79,7 +79,7 @@ export default class HomeScreen extends Component<Props, State> {
 
         if (this.profile.creditScoreDate) {
             this.validDate = this.profile.creditScoreDate;
-            this.validDate.setMonth(this.validDate.getMonth() + 3);
+            this.validDate.setHours(this.validDate.getHours() + (7 * 24));
         }
         this.requestPermissions();
     }
@@ -106,8 +106,8 @@ export default class HomeScreen extends Component<Props, State> {
         Share.share({
             title: 'My credit score',
             message: `I calculated my credit score via Trust credit.\n` +
-            `My credit score is ${scoreRangeTexts[this.getScoreRange()]}.\n`+
-            `Calculate yours by downloading https://shorturl.at/hip04`,
+                `My credit score is ${scoreRangeTexts[this.getScoreRange()]}.\n` +
+                `Calculate yours by downloading https://shorturl.at/hip04`,
             url: 'https://shorturl.at/hip04'
         },)
     }
